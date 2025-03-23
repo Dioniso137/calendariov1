@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Convertitore e Ricerca per Numero di Destino</title>
+  <style>
+    /* Reset e styling globale */
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 20px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .section {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 100%;
+      max-width: 400px;
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    p { margin-bottom: 10px; }
+    input[type="date"],
+    input[type="number"],
+    input[type="text"],
+    button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    button {
+      cursor: pointer;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result p, #searchResults p {
+      margin: 8px 0;
+    }
+    #searchResults {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sezione Convertitore -->
+    <div class="section" id="converterSection">
+      <h1>Convertitore Calendario</h1>
+      <p>Inserisci una data del calendario gregoriano:</p>
+      <input type="date" id="inputDate">
+      <button id="convertButton">Converti</button>
+      <div id="result"></div>
+    </div>
+
+    <!-- Sezione Ricerca per Numero di Destino e Altri Filtri -->
+    <div class="section" id="destinySearchSection">
+      <h2>Cerca Date per Numero di Destino e Filtri</h2>
+      <p>Inserisci il Numero di Destino (opzionale):</p>
+      <input type="number" id="destinyInput" placeholder="Numero di Destino (3 - 53)" min="3" max="53">
+      <p>Inserisci il Numero del Giorno Civile (opzionale):</p>
+      <input type="number" id="civilInput" placeholder="Giorno Civile">
+      <p>Inserisci il Numero del Giorno Sacro (opzionale):</p>
+      <input type="number" id="sacredDayInput" placeholder="Giorno Sacro">
+      <p>Inserisci il Simbolo Sacro (opzionale):</p>
+      <input type="text" id="sacredSymbolInput" placeholder="Simbolo Sacro">
+      <p>Data Iniziale:</p>
+      <input type="date" id="startDate">
+      <p>Data Finale:</p>
+      <input type="date" id="endDate">
+      <button id="searchButton">Cerca Date</button>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+
+  <script>
+    // Date base per la conversione
+    const baseDate1965 = new Date(1965, 1, 21);
+    const baseDate1913 = new Date(1913, 1, 21);
+
+    // Funzione per calcolare il giorno dell'anno (ignorando gli anni bisestili)
+    function getNonLeapDayOfYear(date) {
+      const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      let dayOfYear = 0;
+      for (let i = 0; i < date.getMonth(); i++) {
+        dayOfYear += monthLengths[i];
+      }
+      dayOfYear += date.getDate();
+      return dayOfYear;
+    }
+
+    // Array dei mesi civili
+    const civilMonths = [
+      { name: "Atlcahualo (o Cuauhitlehua)", days: 20 },
+      { name: "Tlacaxipehualiztli", days: 20 },
+      { name: "Tozoztontli", days: 20 },
+      { name: "Huey Tozoztontli", days: 20 },
+      { name: "Toxcatl", days: 20 },
+      { name: "Etzalcualiztli", days: 20 },
+      { name: "Tecuilhuitontli", days: 20 },
+      { name: "Huey Tecuhuitl", days: 20 },
+      { name: "Tlaxochimaco", days: 20 },
+      { name: "Xocotl Huetzi", days: 20 },
+      { name: "Ochpaniztli", days: 20 },
+      { name: "Teotleco", days: 20 },
+      { name: "Tepeilhuitl", days: 20 },
+      { name: "Quecholli", days: 20 },
+      { name: "Panquetzaliztli", days: 20 },
+      { name: "Atemoztli", days: 20 },
+      { name: "Tititl", days: 20 },
+      { name: "Izcalli", days: 20 }
+    ];
+    const nemontemiDays = 5;
+
+    // Array dei nomi sacri
+    const sacredDayNames = [
+      "Cipactli (Coccodrillo)",
+      "Ehecatl (Vento)",
+      "Calli (Casa)",
+      "Cuetzpalin (Lucertola)",
+      "Coatl (Serpente)",
+      "Miquiztli (Morte)",
+      "Mazatl (Cervo)",
+      "Tochtli (Coniglio)",
+      "Atl (Acqua)",
+      "Itzcuintli (Cane)",
+      "Ozomahtli (Scimmia)",
+      "Malinalli (Erba)",
+      "Acatl (Canna)",
+      "Ocelotl (Giaguaro)",
+      "Cuauhtli (Aquila)",
+      "Cozcacuauhtli (Avvoltoio)",
+      "Ollin (Movimento)",
+      "Tecpatl (Coltello di selce)",
+      "Quiahuitl (Pioggia)",
+      "Xochitl (Fiore)"
+    ];
+
+    // Funzione per ottenere il numero del mese civile (usata solo per visualizzazione)
+    function getMonthNumber(civilMonthName) {
+      for (let i = 0; i < civilMonths.length; i++) {
+        if (civilMonths[i].name === civilMonthName) {
+          return i + 1;
+        }
+      }
+      return 0;
+    }
+
+    // Funzione sincrona per calcolare la conversione e il Numero di Destino
+    function computeConversion(inputDate) {
+      const selectedDate = new Date(inputDate);
+      selectedDate.setHours(12, 0, 0, 0);
+      if (selectedDate < baseDate1913) {
+        return { error: "La data è precedente al 2 febbraio 1913." };
+      }
+      let baseDateUsed = (selectedDate < baseDate1965) ? baseDate1913 : baseDate1965;
+      const baseDOY = getNonLeapDayOfYear(baseDateUsed);
+      const selectedDOY = getNonLeapDayOfYear(selectedDate);
+      const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
+      const diff = yearDiff * 365 + (selectedDOY - baseDOY);
+
+      // Calcolo del giorno civile
+      const civilDay = diff % 365;
+      let remainingDays = civilDay;
+      let civilMonthName = "";
+      let civilDayNumber = 0;
+      for (let i = 0; i < civilMonths.length; i++) {
+        if (remainingDays < civilMonths[i].days) {
+          civilMonthName = civilMonths[i].name;
+          civilDayNumber = remainingDays + 1;
+          break;
+        } else {
+          remainingDays -= civilMonths[i].days;
+        }
+      }
+      if (civilMonthName === "") {
+        civilMonthName = "Nemontemi (5 giorni infausti)";
+        civilDayNumber = remainingDays + 1;
+      }
+
+      const sacredDayIndex = diff % 260;
+      const sacredNumber = (sacredDayIndex % 13) + 1;
+      const sacredName = sacredDayNames[sacredDayIndex % 20];
+      const cycleUsed = (selectedDate < baseDate1965) ? "Ciclo 1913" : "Ciclo 1965";
+      const mindNumber = sacredDayNames.indexOf(sacredName) + 1;
+      const destinyNumber = civilDayNumber + mindNumber + sacredNumber;
+
+      return {
+        civil: { month: civilMonthName, day: civilDayNumber },
+        sacred: { number: sacredNumber, name: sacredName },
+        cycle: cycleUsed,
+        mindNumber: mindNumber,
+        destiny: destinyNumber
+      };
+    }
+
+    // --- Gestione della conversione per una data specifica ---
+    document.getElementById("convertButton").addEventListener("click", () => {
+      const inputDate = document.getElementById("inputDate").value;
+      const resultDiv = document.getElementById("result");
+      if (!inputDate) {
+        alert("Per favore, inserisci una data valida.");
+        return;
+      }
+      const result = computeConversion(inputDate);
+      if (result.error) {
+        alert(result.error);
+      } else {
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        resultDiv.innerHTML = `
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Mente:</strong> ${result.mindNumber}</p>
+          <p><strong>Anima:</strong> ${result.sacred.number}</p>
+          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+          <p><em>${result.cycle}</em></p>
+        `;
+      }
+    });
+
+    // --- Funzione per cercare date in un intervallo con filtri multipli ---
+    function searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDateStr, endDateStr) {
+      const results = [];
+      let currentDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+      currentDate.setHours(12,0,0,0);
+      endDate.setHours(12,0,0,0);
+      while (currentDate <= endDate) {
+        const conv = computeConversion(currentDate);
+        if (conv.error) {
+          currentDate.setDate(currentDate.getDate() + 1);
+          continue;
+        }
+        let match = true;
+        if (destinyTarget !== null && destinyTarget !== "") {
+          if (conv.destiny !== destinyTarget) match = false;
+        }
+        if (civilTarget !== null && civilTarget !== "") {
+          if (conv.civil.day !== civilTarget) match = false;
+        }
+        if (sacredDayTarget !== null && sacredDayTarget !== "") {
+          if (conv.sacred.number !== sacredDayTarget) match = false;
+        }
+        if (sacredSymbolTarget !== null && sacredSymbolTarget !== "") {
+          // Confronto case insensitive
+          if (conv.sacred.name.toLowerCase() !== sacredSymbolTarget.toLowerCase()) match = false;
+        }
+        if (match) {
+          results.push(currentDate.toISOString().split('T')[0]);
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return results;
+    }
+
+    // --- Gestione dell'evento per la ricerca con filtri multipli ---
+    document.getElementById("searchButton").addEventListener("click", () => {
+      // Leggi i valori degli input; se non sono compilati, li consideriamo come "" oppure null
+      const destinyValue = document.getElementById("destinyInput").value;
+      const civilValue = document.getElementById("civilInput").value;
+      const sacredDayValue = document.getElementById("sacredDayInput").value;
+      const sacredSymbolValue = document.getElementById("sacredSymbolInput").value;
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      const searchResultsDiv = document.getElementById("searchResults");
+
+      if (!startDate || !endDate) {
+        alert("Per favore, inserisci la data iniziale e la data finale.");
+        return;
+      }
+      
+      // Converti i valori numerici, se presenti
+      const destinyTarget = destinyValue ? parseInt(destinyValue) : "";
+      const civilTarget = civilValue ? parseInt(civilValue) : "";
+      const sacredDayTarget = sacredDayValue ? parseInt(sacredDayValue) : "";
+      const sacredSymbolTarget = sacredSymbolValue ? sacredSymbolValue.trim() : "";
+      
+      const datesFound = searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDate, endDate);
+      if (datesFound.length === 0) {
+        searchResultsDiv.innerHTML = "<p>Nessuna data trovata con i criteri inseriti.</p>";
+      } else {
+        searchResultsDiv.innerHTML = "<p>Date trovate:</p><ul>" +
+          datesFound.map(date => `<li>${date}</li>`).join('') +
+          "</ul>";
+      }
+    });
+  </script>
+</body>
+</html>
