@@ -16,53 +16,8 @@
       background: #fff;
       color: #000;
       line-height: 1.6;
-      padding-bottom: 20px;
+      padding: 20px;
     }
-    /* Header e menu a tendina */
-    header {
-      background: #000;
-      color: #fff;
-      padding: 10px 20px;
-      position: relative;
-    }
-    .menu-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    .menu-toggle {
-      cursor: pointer;
-      font-size: 1.2rem;
-      background: none;
-      border: none;
-      color: #fff;
-    }
-    nav {
-      display: none;
-      flex-direction: column;
-      background: #000;
-      width: 100%;
-      position: absolute;
-      top: 100%;
-      left: 0;
-    }
-    nav a {
-      color: #fff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-top: 1px solid #333;
-    }
-    nav a:hover {
-      background: #333;
-    }
-    .menu-container.active nav {
-      display: flex;
-    }
-    /* Contenitore principale */
     .container {
       max-width: 800px;
       margin: 20px auto;
@@ -84,7 +39,8 @@
       margin-bottom: 10px;
       font-size: 1rem;
     }
-    input[type="date"], button {
+    input[type="date"],
+    button {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
@@ -102,26 +58,12 @@
     button:hover {
       background: #333;
     }
-    /* Canvas per vibrazioni sinusoidali */
-    #sineCanvas {
-      width: 100%;
-      height: 150px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      display: block;
-      margin: 0 auto;
-    }
     /* Responsive per dispositivi mobili */
     @media (max-width: 600px) {
-      header {
+      body {
         padding: 10px;
       }
-      .menu-container {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      nav a {
+      .container {
         padding: 10px;
       }
       input, button {
@@ -132,19 +74,6 @@
   </style>
 </head>
 <body>
-  <!-- Header con menu a tendina -->
-  <header>
-    <div class="menu-container" id="menuContainer">
-      <div class="logo">Astronomia</div>
-      <button class="menu-toggle" onclick="toggleMenu()">Menu &#9776;</button>
-      <nav id="navMenu">
-        <a href="#conversione">Conversione Calendario</a>
-        <a href="#astronomia">Luna &amp; Sole</a>
-        <a href="#vibrazioni">Vibrazioni</a>
-      </nav>
-    </div>
-  </header>
-
   <div class="container">
     <!-- Sezione Conversione Calendario -->
     <section id="conversione" class="section">
@@ -155,28 +84,15 @@
       <div id="result"></div>
     </section>
 
-    <!-- Sezione Dati Luna e Sole -->
+    <!-- Sezione Dati della Luna e del Sole -->
     <section id="astronomia" class="section">
       <h2>Dati della Luna e del Sole</h2>
-      <div id="astroData">
-        <p><strong>Luna:</strong> Fase attuale: <span id="moonPhase">Novilunio</span></p>
-        <p><strong>Sole:</strong> Sorgere: <span id="sunrise">06:00</span> - Tramonto: <span id="sunset">18:00</span></p>
-      </div>
-    </section>
-
-    <!-- Sezione Vibrazioni Sinusoidali -->
-    <section id="vibrazioni" class="section">
-      <h2>Vibrazioni Sinusoidali</h2>
-      <canvas id="sineCanvas"></canvas>
+      <p><strong>Luna:</strong> Fase attuale: <span id="moonPhase">-</span></p>
+      <p><strong>Sole:</strong> Alba: <span id="sunrise">-</span> - Tramonto: <span id="sunset">-</span></p>
     </section>
   </div>
 
   <script>
-    // Funzione per attivare/disattivare il menu a tendina
-    function toggleMenu() {
-      document.getElementById('menuContainer').classList.toggle('active');
-    }
-
     // Date base per la conversione
     const baseDate1965 = new Date(1965, 1, 21);
     const baseDate1913 = new Date(1913, 1, 21);
@@ -297,7 +213,45 @@
       };
     }
 
-    // Gestione della conversione per una data specifica
+    // Funzione per aggiornare i dati della Luna e del Sole in base alla data scelta
+    function updateAstroData(date) {
+      // Calcolo della fase lunare (approssimato)
+      const lp = 2551443; // durata di un ciclo lunare in secondi (approssimato)
+      const now = date.getTime() / 1000;
+      const newMoonEpoch = new Date(1970, 0, 7, 20, 35, 0).getTime() / 1000;
+      const phase = ((now - newMoonEpoch) % lp) / lp;
+      let moonPhase;
+      if (phase < 0.02 || phase > 0.98) {
+        moonPhase = "Novilunio";
+      } else if (phase < 0.25) {
+        moonPhase = "Crescente";
+      } else if (phase < 0.5) {
+        moonPhase = "Gibbosa crescente";
+      } else if (phase < 0.75) {
+        moonPhase = "Gibbosa calante";
+      } else {
+        moonPhase = "Calante";
+      }
+      document.getElementById("moonPhase").textContent = moonPhase;
+      
+      // Calcolo approssimativo di alba e tramonto basato sul mese
+      const month = date.getMonth();
+      let sunrise, sunset;
+      if (month === 11 || month === 0 || month === 1) {
+        sunrise = "07:00";
+        sunset = "17:00";
+      } else if (month >= 4 && month <= 6) {
+        sunrise = "05:30";
+        sunset = "20:00";
+      } else {
+        sunrise = "06:30";
+        sunset = "19:00";
+      }
+      document.getElementById("sunrise").textContent = sunrise;
+      document.getElementById("sunset").textContent = sunset;
+    }
+
+    // Gestione dell'evento per la conversione e l'aggiornamento dei dati astronomici
     document.getElementById("convertButton").addEventListener("click", () => {
       const inputDate = document.getElementById("inputDate").value;
       const resultDiv = document.getElementById("result");
@@ -319,33 +273,9 @@
           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
           <p><em>${result.cycle}</em></p>
         `;
+        // Aggiorna i dati della Luna e del Sole in base alla data scelta
+        updateAstroData(new Date(inputDate));
       }
-    });
-
-    // Vibrazioni Sinusoidali - Animazione su canvas
-    const canvas = document.getElementById('sineCanvas');
-    const ctx = canvas.getContext('2d');
-    let width = canvas.width = canvas.offsetWidth;
-    let height = canvas.height = canvas.offsetHeight;
-    let offset = 0;
-    function drawSine() {
-      ctx.clearRect(0, 0, width, height);
-      ctx.beginPath();
-      ctx.moveTo(0, height / 2);
-      for (let x = 0; x < width; x++) {
-        let y = height / 2 + 40 * Math.sin((x + offset) * 0.05);
-        ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      offset += 2;
-      requestAnimationFrame(drawSine);
-    }
-    drawSine();
-    window.addEventListener('resize', () => {
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
     });
   </script>
 </body>
