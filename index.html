@@ -2,121 +2,442 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Convertitore e Ricerca per Numero di Destino</title>
+  <title>Calen_DARIO Punto di incontro</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+  <!-- Includo la libreria lamejs per l'MP3 encoding -->
+  <script src="https://unpkg.com/lamejs@1.2.0/lame.min.js"></script>
   <style>
-    /* Reset base */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    /* Variabili per il tema scuro */
+    :root {
+      --bg-color: #121212;
+      --primary-color: #00ffff;
+      --secondary-color: #1e1e1e;
+      --accent-color: #2c2c2c;
+      --text-color: #e0e0e0;
+      --border-color: #333;
+      --btn-bg: #222;
+      --btn-hover: #333;
+      --box-bg: #1e1e1e;
     }
+    
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #fff;
-      color: #000;
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
       padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       line-height: 1.6;
     }
+
+    h1, h2, h3, h4 {
+      margin-bottom: 1rem;
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Contenitore principale */
     .container {
-      max-width: 800px;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Layout a due colonne, con wrapping su schermi piccoli */
+    .main-container {
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       gap: 20px;
-      padding: 20px;
+      margin-bottom: 40px;
     }
-    .section {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+
+    .left-column, .right-column {
+      flex: 1 1 300px;
+      background-color: var(--secondary-color);
       padding: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
     }
-    h1, h2 {
+
+    /* Sezioni del convertitore */
+    .converter-section {
+      margin-bottom: 20px;
+    }
+
+    .converter-section p {
+      margin-bottom: 0.5rem;
+    }
+
+    .converter-section input,
+    .converter-section button {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      background-color: var(--accent-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    .converter-section button:hover {
+      background-color: var(--btn-hover);
+      cursor: pointer;
+    }
+
+    /* Griglia delle immagini */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
+    
+    .grid-container img {
+      width: 100%;
+      background-color: #fff;
+      border-radius: 4px;
+      border: 2px solid transparent;
+      transition: border 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    
+    .grid-container img:hover {
+      box-shadow: 0 0 10px var(--primary-color);
+    }
+    
+    .selected {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 20px var(--primary-color);
+    }
+
+    /* Sezione Sintesi e Dati Astronomici */
+    .info-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .synthesis-column,
+    .cycles-column {
+      flex: 1 1 300px;
+      background-color: var(--box-bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .synthesis-box {
+      background-color: var(--accent-color);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+    
+    /* Popup Overlay */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .popup-content {
+      background: var(--box-bg);
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+    }
+    
+    .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+    
+    /* Sezione Onde Sinusoidali */
+    .canvas-container {
+      background-color: var(--box-bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 40px;
+    }
+    
+    .canvas-section {
+      margin-bottom: 30px;
+    }
+    
+    .canvas-section h2 {
       text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .canvas-section canvas {
+      display: block;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    
+    /* Sezione Generatore di Battiti Binaurali */
+    #controls {
+      max-width: 500px;
+      margin: 40px auto;
+      background-color: var(--box-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    #controls div {
       margin-bottom: 15px;
     }
-    p {
-      margin-bottom: 10px;
-      font-size: 1rem;
+    
+    #controls label {
+      display: block;
+      margin-bottom: 5px;
     }
-    input[type="date"],
-    input[type="number"],
-    input[type="text"],
-    button {
+    
+    #controls input[type="number"] {
       width: 100%;
-      padding: 12px 15px;
-      margin-bottom: 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      padding: 8px;
+      font-size: 16px;
+      background-color: var(--accent-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      border-radius: 4px;
     }
-    button {
-      background: #000;
-      color: #fff;
+    
+    #controls input[type="checkbox"] {
+      margin-right: 5px;
+      transform: scale(1.2);
+    }
+    
+    #controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: var(--btn-bg);
       border: none;
+      color: var(--text-color);
+      margin: 5px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      border-radius: 4px;
+      transition: background-color 0.3s;
     }
-    button:hover {
-      background: #333;
+    
+    #controls button:hover {
+      background-color: var(--btn-hover);
     }
-    #result, #searchResults {
-      margin-top: 10px;
+    
+    #controls #status {
+      margin-top: 20px;
+      font-weight: bold;
     }
+    
+    #visualizerContainer {
+      max-width: 800px;
+      margin: 30px auto;
+    }
+    
+    #visualizer {
+      width: 100%;
+      height: 300px;
+      border: 1px solid var(--border-color);
+      background: var(--secondary-color);
+      border-radius: 4px;
+    }
+    
     /* Responsive per dispositivi mobili */
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
+    @media (max-width: 768px) {
+      .main-container, .info-container {
+        flex-direction: column;
       }
-      .container {
-        padding: 10px;
-      }
-      input, button {
-        padding: 10px;
-        font-size: 0.9rem;
-      }
+    }
+    
+    /* Stili per le card dei Dati Astronomici */
+    .card {
+      background-color: var(--box-bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    .timeline {
+      position: relative;
+      height: 50px;
+      margin-top: 20px;
+      border-top: 2px solid var(--border-color);
+    }
+    .marker {
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 20px;
+      color: var(--bg-color);
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .label {
+      position: absolute;
+      top: 30px;
+      font-size: 12px;
+      transform: translateX(-50%);
+      white-space: nowrap;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Sezione Convertitore -->
-    <div class="section" id="converterSection">
-      <h1>Convertitore Calendario</h1>
-      <p>Inserisci una data del calendario gregoriano:</p>
-      <input type="date" id="inputDate">
-      <button id="convertButton">Converti</button>
-      <div id="result"></div>
+    <!-- Sezione Convertitore e Griglia Immagini -->
+    <div class="main-container">
+      <!-- Colonna sinistra: Convertitore -->
+      <div class="left-column">
+        <h1>CALEN-DARIO Punto di incontro</h1>
+        <div class="converter-section">
+          <p>Inserisci una data del calendario gregoriano:</p>
+          <input type="date" id="inputDate">
+          <button id="convertButton">Converti</button>
+          <p id="destinyNumber"></p>
+        </div>
+        <div class="converter-section">
+          <p>Inserisci una seconda data del calendario gregoriano:</p>
+          <input type="date" id="inputDate2">
+          <button id="convertButton2">Converti Seconda Data</button>
+          <p id="destinyNumber2"></p>
+        </div>
+      </div>
+      <!-- Colonna destra: Griglia delle immagini -->
+      <div class="right-column">
+        <div class="grid-container" id="gridContainer">
+          <!-- Le immagini verranno inserite dinamicamente -->
+        </div>
+      </div>
     </div>
 
-    <!-- Sezione Ricerca per Numero di Destino e Filtri -->
-    <div class="section" id="destinySearchSection">
-      <h2>Cerca Date per Numero di Destino e Filtri</h2>
-      <p>Inserisci il Numero di Destino (opzionale):</p>
-      <input type="number" id="destinyInput" placeholder="Numero di Destino (3 - 53)" min="3" max="53">
-      <p>Inserisci il Numero del Giorno Civile (opzionale):</p>
-      <input type="number" id="civilInput" placeholder="Giorno Civile">
-      <p>Inserisci il Numero del Giorno Sacro (opzionale):</p>
-      <input type="number" id="sacredDayInput" placeholder="Giorno Sacro">
-      <p>Inserisci il Simbolo Sacro (opzionale):</p>
-      <input type="text" id="sacredSymbolInput" placeholder="Simbolo Sacro">
-      <p>Data Iniziale:</p>
-      <input type="date" id="startDate">
-      <p>Data Finale:</p>
-      <input type="date" id="endDate">
-      <button id="searchButton">Cerca Date</button>
-      <div id="searchResults"></div>
+    <!-- Sezione Sintesi e Dati Astronomici -->
+    <div class="info-container">
+      <div class="synthesis-column" id="synthesis">
+        <h3>Sintesi del Mese</h3>
+        <p>Qui verranno visualizzate le informazioni personalizzate del mese e del giorno sacro.</p>
+      </div>
+      <div class="cycles-column" id="astronomicalData">
+        <h3>Dati Astronomici: Sole e Luna</h3>
+        <div class="card" id="soleData">
+          <h4>☀️ Sole</h4>
+          <p id="sunriseData">Alba: caricamento...</p>
+          <p id="solarNoonData">Mezzogiorno: caricamento...</p>
+          <p id="sunsetData">Tramonto: caricamento...</p>
+          <p id="dayLengthData">Durata del giorno: caricamento...</p>
+          <div class="timeline" id="sunTimelineData"></div>
+        </div>
+        <div class="card" id="moonData">
+          <h4>🌙 Luna</h4>
+          <p id="moonPhaseData">Fase della Luna: caricamento...</p>
+          <div id="moonRepresentationData" style="margin-top: 20px; font-size: 48px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sezione Onde Sinusoidali -->
+    <div class="canvas-container">
+      <div class="canvas-section">
+        <h2>Spirito (Frequenza dinamica in Hz)</h2>
+        <canvas id="canvasSpirit" width="800" height="200"></canvas>
+      </div>
+      <div class="canvas-section">
+        <h2>Mente (Frequenza dinamica in Hz)</h2>
+        <canvas id="canvasMente" width="800" height="200"></canvas>
+      </div>
+      <div class="canvas-section">
+        <h2>Anima (Frequenza dinamica in Hz)</h2>
+        <canvas id="canvasAnima" width="800" height="200"></canvas>
+      </div>
+      <div class="canvas-section">
+        <h2>Unione di Spirito, Mente e Anima</h2>
+        <canvas id="canvasCombined" width="800" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Popup Overlay -->
+    <div id="popup" class="popup-overlay">
+      <div class="popup-content">
+        <span class="popup-close">&times;</span>
+        <div id="popup-text"></div>
+      </div>
+    </div>
+
+    <!-- Sezione Generatore di Battiti Binaurali -->
+    <h1 style="text-align:center;">Generatore di Battiti Binaurali<br>Spirito - Mente - Anima</h1>
+    <div id="controls">
+      <div>
+        <label for="spiritoFreq">Frequenza Spirito (Hz):</label>
+        <input type="number" id="spiritoFreq" value="100" min="20" max="20000">
+        <label><input type="checkbox" id="spiritoCheck" checked> Attiva Spirito</label>
+      </div>
+      <div>
+        <label for="menteFreq">Frequenza Mente (Hz):</label>
+        <input type="number" id="menteFreq" value="111" min="20" max="20000">
+        <label><input type="checkbox" id="menteCheck" checked> Attiva Mente</label>
+      </div>
+      <div>
+        <label for="animaFreq">Frequenza Anima (Hz):</label>
+        <input type="number" id="animaFreq" value="120" min="20" max="20000">
+        <label><input type="checkbox" id="animaCheck" checked> Attiva Anima</label>
+      </div>
+      <div>
+        <button id="playBtn">Avvia Selezionati</button>
+        <button id="stopBtn">Ferma</button>
+        <button id="downloadBtn">Scarica MP3 (30 minuti)</button>
+      </div>
+      <div id="status"></div>
+    </div>
+    <div id="visualizerContainer">
+      <canvas id="visualizer"></canvas>
     </div>
   </div>
 
+  <!-- Script JavaScript -->
   <script>
-    // Date base per la conversione
+    // ============================
+    // FUNZIONI PER IL CALENDARIO AZTECO
+    // ============================
+    // Definisco le due base: dal 2 febbraio 1913 e dal 2 febbraio 1965
     const baseDate1965 = new Date(1965, 1, 21);
     const baseDate1913 = new Date(1913, 1, 21);
 
-    // Funzione per calcolare il giorno dell'anno (ignorando gli anni bisestili)
     function getNonLeapDayOfYear(date) {
       const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
       let dayOfYear = 0;
@@ -127,7 +448,10 @@
       return dayOfYear;
     }
 
-    // Array dei mesi civili
+    function isLeapYear(year) {
+      return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0));
+    }
+
     const civilMonths = [
       { name: "Atlcahualo (o Cuauhitlehua)", days: 20 },
       { name: "Tlacaxipehualiztli", days: 20 },
@@ -150,7 +474,6 @@
     ];
     const nemontemiDays = 5;
 
-    // Array dei nomi sacri
     const sacredDayNames = [
       "Cipactli (Coccodrillo)",
       "Ehecatl (Vento)",
@@ -174,7 +497,196 @@
       "Xochitl (Fiore)"
     ];
 
-    // Funzione per ottenere il numero del mese civile (per visualizzazione)
+    // Mappa per associare il nome sacro all'immagine corrispondente
+    const sacredImages = {
+      "Cipactli (Coccodrillo)": "file:///Users/mac/Desktop/CALEN-DARIO/Coccodrillo.png",
+      "Ehecatl (Vento)": "file:///Users/mac/Desktop/CALEN-DARIO/Vento.png",
+      "Calli (Casa)": "file:///Users/mac/Desktop/CALEN-DARIO/Casa.png",
+      "Cuetzpalin (Lucertola)": "file:///Users/mac/Desktop/CALEN-DARIO/Lucertola.png",
+      "Coatl (Serpente)": "file:///Users/mac/Desktop/CALEN-DARIO/Serpente.png",
+      "Miquiztli (Morte)": "file:///Users/mac/Desktop/CALEN-DARIO/Morte.png",
+      "Mazatl (Cervo)": "file:///Users/mac/Desktop/CALEN-DARIO/Cervo.png",
+      "Tochtli (Coniglio)": "file:///Users/mac/Desktop/CALEN-DARIO/Coniglio.png",
+      "Atl (Acqua)": "file:///Users/mac/Desktop/CALEN-DARIO/Acqua.png",
+      "Itzcuintli (Cane)": "file:///Users/mac/Desktop/CALEN-DARIO/Cane.png",
+      "Ozomahtli (Scimmia)": "file:///Users/mac/Desktop/CALEN-DARIO/Scimmia.png",
+      "Malinalli (Erba)": "file:///Users/mac/Desktop/CALEN-DARIO/Erba.png",
+      "Acatl (Canna)": "file:///Users/mac/Desktop/CALEN-DARIO/Canna.png",
+      "Ocelotl (Giaguaro)": "file:///Users/mac/Desktop/CALEN-DARIO/Giaguaro.png",
+      "Cuauhtli (Aquila)": "file:///Users/mac/Desktop/CALEN-DARIO/Aquila.png",
+      "Cozcacuauhtli (Avvoltoio)": "file:///Users/mac/Desktop/CALEN-DARIO/Avvoltoio.png",
+      "Ollin (Movimento)": "file:///Users/mac/Desktop/CALEN-DARIO/Movimento.png",
+      "Tecpatl (Coltello di selce)": "file:///Users/mac/Desktop/CALEN-DARIO/Selce.png",
+      "Quiahuitl (Pioggia)": "file:///Users/mac/Desktop/CALEN-DARIO/Pioggia.png",
+      "Xochitl (Fiore)": "file:///Users/mac/Desktop/CALEN-DARIO/Fiore.png"
+    };
+
+    const popupTexts = {
+      "Cipactli (Coccodrillo)": "<strong>Cipactli – Uitzilopochtli</strong><br>Cipactli, il “mostro primordiale”, è il segno inaugurale del calendario. Uitzilopochtli incarna la forza primordiale e creatrice.",
+      "Ehecatl (Vento)": "<strong>Ehecatl – Paynal</strong><br>Ehecatl, il vento che muove le energie, si collega a Paynal, guidando le processioni e il rinnovamento.",
+      "Calli (Casa)": "<strong>Calli – Tezcatlipoca</strong><br>Calli richiama l’intimità e il riflesso del proprio io, associata a Tezcatlipoca e alla dualità.",
+      "Cuetzpalin (Lucertola)": "<strong>Cuetzpalin – Tlaloc</strong><br>Cuetzpalin offre rigenerazione e rapidità nei cambiamenti.",
+      "Coatl (Serpente)": "<strong>Coatl – Quetzalcoatl</strong><br>Coatl simboleggia trasformazione e rinascita.",
+      "Miquiztli (Morte)": "<strong>Miquiztli – Ciuacoatl</strong><br>Miquiztli, il giorno della morte, apre la via a una nuova nascita.",
+      "Mazatl (Cervo)": "<strong>Mazatl – Chicome Coatl</strong><br>Mazatl incarna grazia e connessione con la natura.",
+      "Tochtli (Coniglio)": "<strong>Tochtli – Teteu innan (Toci)</strong><br>Tochtli simboleggia prosperità e continuità.",
+      "Atl (Acqua)": "<strong>Atl – Tzapotlan tenan</strong><br>Atl evoca il potere rigenerativo dell’acqua.",
+      "Itzcuintli (Cane)": "<strong>Itzcuintli – Ciuapipiltin</strong><br>Itzcuintli rappresenta fedeltà e protezione.",
+      "Ozomahtli (Scimmia)": "<strong>Ozomahtli – Chalchiuhtli ycue</strong><br>Ozomahtli unisce agilità e gioco con sacralità.",
+      "Malinalli (Erba)": "<strong>Malinalli – Tlacolteutl</strong><br>Malinalli richiama l’abbondanza della vegetazione.",
+      "Acatl (Canna)": "<strong>Acatl – Xiuhtecutli</strong><br>Acatl simboleggia forza ed elasticità.",
+      "Ocelotl (Giaguaro)": "<strong>Ocelotl – Macuilxochitl (Xochipilli)</strong><br>Ocelotl, simbolo di potenza e mistero.",
+      "Cuauhtli (Aquila)": "<strong>Cuauhtli – Omacatl</strong><br>Cuauhtli incarna visione e nobiltà.",
+      "Cozcacuauhtli (Avvoltoio)": "<strong>Cozcacuauhtli – IxtlUton</strong><br>Cozcacuauhtli richiama il ciclo di vita e morte.",
+      "Ollin (Movimento)": "<strong>Ollin – Opochtli</strong><br>Ollin simboleggia il cambiamento costante.",
+      "Tecpatl (Coltello di selce)": "<strong>Tecpatl – Xipe Totec</strong><br>Tecpatl separa il vecchio dal nuovo.",
+      "Quiahuitl (Pioggia)": "<strong>Quiahuitl – Yiacatecutli</strong><br>Quiahuitl porta purificazione e rinnovamento.",
+      "Xochitl (Fiore)": "<strong>Xochitl – Napa tecutli</strong><br>Xochitl esprime il continuo rinnovarsi della vita."
+    };
+
+    const pdfMonthTexts = {
+      "Atlcahualo (o Cuauhitlehua)": "Il primo mese dell'anno, con celebrazioni e sacrifici per garantire l'abbondanza.",
+      "Tlacaxipehualiztli": "Mese dei riti e sacrifici in onore del dio Totec.",
+      "Tozoztontli": "Inizio della semina e risveglio della terra.",
+      "Huey Tozoztontli": "Celebrazione dell’abbondanza agricola.",
+      "Toxcatl": "Mese di sacrifici per la rinascita spirituale.",
+      "Etzalcualiztli": "Dedica agli dei della pioggia e al rinnovamento della terra.",
+      "Tecuilhuitontli": "Festa in onore della tradizione rituale.",
+      "Huey Tecuhuitl": "Celebra la dea del mais e la rinascita.",
+      "Tlaxochimaco": "Festa del dio della guerra e della fertilità.",
+      "Xocotl Huetzi": "Dedicato al dio del fuoco e alla distruzione purificatrice.",
+      "Ochpaniztli": "Rituali solenni in onore della dea madre.",
+      "Teotleco": "Celebrazione del compimento del ciclo.",
+      "Tepeilhuitl": "Dedica alle vette sacre e alla stabilità.",
+      "Quecholli": "Riti di penitenza in preparazione alla caccia.",
+      "Panquetzaliztli": "Celebra la guerra e il rinnovamento della forza.",
+      "Atemoztli": "Festa degli dei della pioggia e della purificazione.",
+      "Tititl": "Rituali intensi per onorare la dea madre.",
+      "Izcalli": "Celebrazione periodica del dio del fuoco.",
+      "Nemontemi": "I cinque giorni sfortunati riservati al riposo."
+    };
+
+    const pdfSacredTexts = {
+      "Cipactli (Coccodrillo)": "Il coccodrillo rappresenta la creazione e il caos primordiale.",
+      "Ehecatl (Vento)": "Ehecatl incarna il respiro della vita e il continuo mutare dell’energia.",
+      "Calli (Casa)": "Calli simboleggia il rifugio interiore e il legame profondo con la propria identità.",
+      "Cuetzpalin (Lucertola)": "La lucertola rappresenta la trasformazione e la capacità di rigenerarsi.",
+      "Coatl (Serpente)": "Il serpente unisce il mondo materiale a quello spirituale.",
+      "Miquiztli (Morte)": "Miquiztli porta la fine per fare spazio a una nuova vita.",
+      "Mazatl (Cervo)": "Il cervo incarna grazia e una profonda connessione con la natura.",
+      "Tochtli (Coniglio)": "Il coniglio simboleggia prosperità e continuità.",
+      "Atl (Acqua)": "L'acqua è fonte di vita e purificazione.",
+      "Itzcuintli (Cane)": "Il cane rappresenta fedeltà e protezione.",
+      "Ozomahtli (Scimmia)": "La scimmia unisce il gioco alla sacralità, esprimendo agilità.",
+      "Malinalli (Erba)": "L'erba simboleggia crescita e vitalità.",
+      "Acatl (Canna)": "La canna evoca la forza degli antichi e la resilienza.",
+      "Ocelotl (Giaguaro)": "Il giaguaro incarna potenza, mistero e coraggio.",
+      "Cuauhtli (Aquila)": "L'aquila è emblema di visione, nobiltà e connessione spirituale.",
+      "Cozcacuauhtli (Avvoltoio)": "L'avvoltoio richiama il ciclo di vita e morte, preludio a una rinascita.",
+      "Ollin (Movimento)": "Ollin simboleggia il cambiamento costante dell'energia vitale.",
+      "Tecpatl (Coltello di selce)": "Il Tecpatl simboleggia la trasformazione netto tra vecchio e nuovo.",
+      "Quiahuitl (Pioggia)": "La pioggia purifica e rinnova, portando fertilità alla terra.",
+      "Xochitl (Fiore)": "Il fiore rappresenta la bellezza effimera e il continuo rinnovarsi della natura."
+    };
+
+    const numberMeanings = {
+      1: "Origine e Creazione",
+      2: "Dualità ed Equilibrio",
+      3: "Dinamismo e Crescita",
+      4: "Stabilità e Ordine",
+      5: "Transizione e Adattabilità",
+      6: "Armonia e Integrazione",
+      7: "Spiritualità e Mistero",
+      8: "Abbondanza e Manifestazione",
+      9: "Compimento e Realizzazione",
+      10: "Ordine Universale",
+      11: "Rinnovamento e Visione",
+      12: "Ciclicità e Armonia Cosmiche",
+      13: "Culmine e Trasformazione"
+    };
+
+    const civilMeanings = {
+      "Atlcahualo (o Cuauhitlehua)": "Inizio dell'anno; associato all'acqua e alla fertilità.",
+      "Tlacaxipehualiztli": "Mese del sacrificio e del rinnovamento.",
+      "Tozoztontli": "Segna l'inizio della semina e il risveglio della terra.",
+      "Huey Tozoztontli": "Celebra l'abbondanza agricola.",
+      "Toxcatl": "Mese del sacrificio e della rinascita spirituale.",
+      "Etzalcualiztli": "Onora la terra e il ciclo vitale.",
+      "Tecuilhuitontli": "Festa in onore della tradizione rituale.",
+      "Huey Tecuhuitl": "Celebra la dea del mais e la rinascita.",
+      "Tlaxochimaco": "Festa del dio della guerra e della fertilità.",
+      "Xocotl Huetzi": "Dedicato al dio del fuoco e alla distruzione purificatrice.",
+      "Ochpaniztli": "Rituali solenni in onore della dea madre.",
+      "Teotleco": "Celebrazione del compimento del ciclo.",
+      "Tepeilhuitl": "Dedica alle vette sacre e alla stabilità.",
+      "Quecholli": "Riti di penitenza per prepararsi alla caccia.",
+      "Panquetzaliztli": "Celebra la guerra e il rinnovamento della forza.",
+      "Atemoztli": "Festa degli dei della pioggia e della purificazione.",
+      "Tititl": "Rituali intensi per onorare la dea madre.",
+      "Izcalli": "Celebrazione periodica del dio del fuoco.",
+      "Nemontemi (5 giorni infausti)": "Giorni sfortunati, riservati al riposo."
+    };
+
+    // MODIFICA: La funzione convertDate ora supporta anche date dal 2 febbraio 1913.
+    function convertDate(inputDate) {
+      return new Promise((resolve) => {
+        const selectedDate = new Date(inputDate);
+        selectedDate.setHours(12, 0, 0, 0);
+        // Se la data è precedente al 2 febbraio 1913 non viene elaborata
+        if (selectedDate < baseDate1913) {
+          resolve({ error: "La data inserita è precedente al 2 febbraio 1913." });
+          return;
+        }
+        // Se la data è antecedente al 2 febbraio 1965, usa il ciclo retroattivo (1913)
+        let baseDateUsed;
+        if (selectedDate < baseDate1965) {
+          baseDateUsed = baseDate1913;
+        } else {
+          baseDateUsed = baseDate1965;
+        }
+        const baseDOY = getNonLeapDayOfYear(baseDateUsed);
+        const selectedDOY = getNonLeapDayOfYear(selectedDate);
+        const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
+        const diff = yearDiff * 365 + (selectedDOY - baseDOY);
+        
+        const civilDay = diff % 365;
+        let remainingDays = civilDay;
+        let civilMonthName = "";
+        let civilDayNumber = 0;
+        for (let i = 0; i < civilMonths.length; i++) {
+          if (remainingDays < civilMonths[i].days) {
+            civilMonthName = civilMonths[i].name;
+            civilDayNumber = remainingDays + 1;
+            break;
+          } else {
+            remainingDays -= civilMonths[i].days;
+          }
+        }
+        if (civilMonthName === "") {
+          civilMonthName = "Nemontemi (5 giorni infausti)";
+          civilDayNumber = remainingDays + 1;
+        }
+        const sacredDayIndex = diff % 260;
+        const sacredNumber = (sacredDayIndex % 13) + 1;
+        const sacredName = sacredDayNames[sacredDayIndex % 20];
+        
+        // Indica quale ciclo è stato usato
+        const cycleUsed = (selectedDate < baseDate1965) ? "Ciclo 1913" : "Ciclo 1965";
+
+        resolve({
+          civil: {
+            month: civilMonthName,
+            day: civilDayNumber
+          },
+          sacred: {
+            number: sacredNumber,
+            name: sacredName
+          },
+          cycle: cycleUsed
+        });
+      });
+    }
+
     function getMonthNumber(civilMonthName) {
       for (let i = 0; i < civilMonths.length; i++) {
         if (civilMonths[i].name === civilMonthName) {
@@ -184,143 +696,516 @@
       return 0;
     }
 
-    // Funzione per calcolare la conversione e il Numero di Destino
-    function computeConversion(inputDate) {
-      const selectedDate = new Date(inputDate);
-      selectedDate.setHours(12, 0, 0, 0);
-      if (selectedDate < baseDate1913) {
-        return { error: "La data è precedente al 2 febbraio 1913." };
+    // ============================
+    // FUNZIONI PER I DATI ASTRONOMICI (SOLE E LUNA)
+    // ============================
+    function formatUTC(dateStr) {
+      const date = new Date(dateStr);
+      return date.toUTCString();
+    }
+    
+    function createTimelineMarkersAstronomical(sunrise, solarNoon, sunset) {
+      const timeline = document.getElementById("sunTimelineData");
+      timeline.innerHTML = "";
+      
+      const sunriseTime = new Date(sunrise).getTime();
+      const solarNoonTime = new Date(solarNoon).getTime();
+      const sunsetTime = new Date(sunset).getTime();
+      const totalDuration = sunsetTime - sunriseTime;
+      
+      const posSunrise = 0;
+      const posSolarNoon = ((solarNoonTime - sunriseTime) / totalDuration) * 100;
+      const posSunset = 100;
+      
+      const markers = [
+        { time: sunrise, pos: posSunrise, label: 'Alba' },
+        { time: solarNoon, pos: posSolarNoon, label: 'Mezzogiorno' },
+        { time: sunset, pos: posSunset, label: 'Tramonto' }
+      ];
+      
+      markers.forEach(marker => {
+        const markerDiv = document.createElement("div");
+        markerDiv.className = "marker";
+        markerDiv.style.left = marker.pos + "%";
+        markerDiv.innerText = marker.label.charAt(0);
+        timeline.appendChild(markerDiv);
+        
+        const labelDiv = document.createElement("div");
+        labelDiv.className = "label";
+        labelDiv.style.left = marker.pos + "%";
+        labelDiv.innerText = new Date(marker.time).toUTCString().slice(17,22);
+        timeline.appendChild(labelDiv);
+      });
+    }
+    
+    function updateAstronomicalData() {
+      let selectedDate = document.getElementById("inputDate").value;
+      if (!selectedDate) {
+        let today = new Date();
+        selectedDate = today.toISOString().split("T")[0];
+        document.getElementById("inputDate").value = selectedDate;
       }
-      let baseDateUsed = (selectedDate < baseDate1965) ? baseDate1913 : baseDate1965;
-      const baseDOY = getNonLeapDayOfYear(baseDateUsed);
-      const selectedDOY = getNonLeapDayOfYear(selectedDate);
-      const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
-      const diff = yearDiff * 365 + (selectedDOY - baseDOY);
-
-      // Calcolo del giorno civile
-      const civilDay = diff % 365;
-      let remainingDays = civilDay;
-      let civilMonthName = "";
-      let civilDayNumber = 0;
-      for (let i = 0; i < civilMonths.length; i++) {
-        if (remainingDays < civilMonths[i].days) {
-          civilMonthName = civilMonths[i].name;
-          civilDayNumber = remainingDays + 1;
-          break;
-        } else {
-          remainingDays -= civilMonths[i].days;
-        }
-      }
-      if (civilMonthName === "") {
-        civilMonthName = "Nemontemi (5 giorni infausti)";
-        civilDayNumber = remainingDays + 1;
-      }
-
-      const sacredDayIndex = diff % 260;
-      const sacredNumber = (sacredDayIndex % 13) + 1;
-      const sacredName = sacredDayNames[sacredDayIndex % 20];
-      const cycleUsed = (selectedDate < baseDate1965) ? "Ciclo 1913" : "Ciclo 1965";
-      const mindNumber = sacredDayNames.indexOf(sacredName) + 1;
-      const destinyNumber = civilDayNumber + mindNumber + sacredNumber;
-
-      return {
-        civil: { month: civilMonthName, day: civilDayNumber },
-        sacred: { number: sacredNumber, name: sacredName },
-        cycle: cycleUsed,
-        mindNumber: mindNumber,
-        destiny: destinyNumber
-      };
+      
+      // Aggiornamento dati del Sole
+      fetch("https://api.sunrise-sunset.org/json?lat=51.4779&lng=0.0015&formatted=0&date=" + selectedDate)
+        .then(response => response.json())
+        .then(data => {
+          const results = data.results;
+          document.getElementById("sunriseData").innerText = "Alba: " + formatUTC(results.sunrise);
+          document.getElementById("solarNoonData").innerText = "Mezzogiorno: " + formatUTC(results.solar_noon);
+          document.getElementById("sunsetData").innerText = "Tramonto: " + formatUTC(results.sunset);
+          document.getElementById("dayLengthData").innerText = "Durata del giorno: " + results.day_length;
+          createTimelineMarkersAstronomical(results.sunrise, results.solar_noon, results.sunset);
+        })
+        .catch(error => {
+          console.error("Errore nel recupero dati del Sole:", error);
+          document.getElementById("sunriseData").innerText = "Errore nel caricamento dei dati del Sole.";
+        });
+      
+      // Aggiornamento dati della Luna
+      let unixTimestamp = Math.floor(new Date(selectedDate + "T00:00:00Z").getTime() / 1000);
+      fetch("http://api.farmsense.net/v1/moonphases/?d=" + unixTimestamp)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            let moonData = data[0];
+            const phase = moonData.Phase;
+            document.getElementById("moonPhaseData").innerText = "Fase della Luna: " + phase;
+            const moonRep = document.getElementById("moonRepresentationData");
+            let moonIcon = "🌑"; // Luna Nuova di default
+            const phaseLower = phase.toLowerCase();
+            if (phaseLower.includes("full")) {
+              moonIcon = "🌕";
+            } else if (phaseLower.includes("waxing") && phaseLower.includes("crescent")) {
+              moonIcon = "🌒";
+            } else if (phaseLower.includes("waning") && phaseLower.includes("crescent")) {
+              moonIcon = "🌘";
+            } else if (phaseLower.includes("first quarter")) {
+              moonIcon = "🌓";
+            } else if (phaseLower.includes("last quarter") || phaseLower.includes("third quarter")) {
+              moonIcon = "🌗";
+            } else if (phaseLower.includes("waxing") && phaseLower.includes("gibbous")) {
+              moonIcon = "🌔";
+            } else if (phaseLower.includes("waning") && phaseLower.includes("gibbous")) {
+              moonIcon = "🌖";
+            }
+            moonRep.innerText = moonIcon;
+          } else {
+            document.getElementById("moonPhaseData").innerText = "Dati della Luna non disponibili.";
+          }
+        })
+        .catch(error => {
+          console.error("Errore nel recupero dati della Luna:", error);
+          document.getElementById("moonPhaseData").innerText = "Errore nel caricamento dei dati della Luna.";
+        });
     }
 
-    // Gestione della conversione per una data specifica
-    document.getElementById("convertButton").addEventListener("click", () => {
+    // ============================
+    // GESTIONE DELLA GRIGLIA DI IMMAGINI E POPUP
+    // ============================
+    const gridContainer = document.getElementById("gridContainer");
+    sacredDayNames.forEach(dayName => {
+      const img = document.createElement("img");
+      img.src = sacredImages[dayName];
+      img.alt = dayName;
+      img.setAttribute("data-sacred-name", dayName);
+      gridContainer.appendChild(img);
+    });
+
+    const popup = document.getElementById("popup");
+    const popupText = document.getElementById("popup-text");
+    const popupClose = document.querySelector(".popup-close");
+
+    document.querySelectorAll(".grid-container img").forEach(img => {
+      img.addEventListener("click", () => {
+        const dayName = img.getAttribute("data-sacred-name");
+        const text = popupTexts[dayName] || "Nessuna descrizione disponibile per questo giorno.";
+        popupText.innerHTML = text;
+        popup.style.display = "flex";
+      });
+    });
+
+    popupClose.addEventListener("click", () => {
+      popup.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+      if (e.target === popup) {
+        popup.style.display = "none";
+      }
+    });
+
+    // ============================
+    // DISEGNO DELLE ONDE SINUSOIDALI
+    // ============================
+    function drawSineWave(ctx, frequency, color) {
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      const amplitude = height / 2 - 10;
+      const duration = 1;
+      ctx.clearRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      for (let x = 0; x < width; x++) {
+        const y = height / 2 + amplitude * Math.sin(2 * Math.PI * frequency * (x / width) * duration);
+        ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawOverlappingSineWaves(ctx, frequencies, colors) {
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      const amplitude = height / 2 - 10;
+      const duration = 1;
+      ctx.clearRect(0, 0, width, height);
+      frequencies.forEach((frequency, index) => {
+        ctx.beginPath();
+        ctx.moveTo(0, height / 2);
+        for (let x = 0; x < width; x++) {
+          const y = height / 2 + amplitude * Math.sin(2 * Math.PI * frequency * (x / width) * duration);
+          ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = colors[index];
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    // Funzione per aggiornare dinamicamente le onde in base ai valori calcolati
+    function updateSineWaves(spiritFreq, mindFreq, soulFreq) {
+      const canvasSpirit = document.getElementById('canvasSpirit');
+      const canvasMente = document.getElementById('canvasMente');
+      const canvasAnima = document.getElementById('canvasAnima');
+      const canvasCombined = document.getElementById('canvasCombined');
+      
+      if (canvasSpirit && canvasMente && canvasAnima && canvasCombined) {
+        const ctxSpirit = canvasSpirit.getContext('2d');
+        const ctxMente = canvasMente.getContext('2d');
+        const ctxAnima = canvasAnima.getContext('2d');
+        const ctxCombined = canvasCombined.getContext('2d');
+        
+        drawSineWave(ctxSpirit, spiritFreq, 'red');
+        drawSineWave(ctxMente, mindFreq, 'lime');
+        drawSineWave(ctxAnima, soulFreq, 'blue');
+        drawOverlappingSineWaves(ctxCombined, [spiritFreq, mindFreq, soulFreq], ['red', 'lime', 'blue']);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSineWaves(19, 11, 4); // Valori iniziali di default
+    });
+
+    // ============================
+    // GESTIONE DELLA CONVERSIONE DELLE DATE
+    // ============================
+    document.getElementById("convertButton").addEventListener("click", async () => {
       const inputDate = document.getElementById("inputDate").value;
-      const resultDiv = document.getElementById("result");
       if (!inputDate) {
         alert("Per favore, inserisci una data valida.");
         return;
       }
-      const result = computeConversion(inputDate);
+      const result = await convertDate(inputDate);
       if (result.error) {
         alert(result.error);
       } else {
-        const civilMonthNumber = getMonthNumber(result.civil.month);
-        resultDiv.innerHTML = `
-          <p><strong>Spirito:</strong> ${result.civil.day}</p>
-          <p><strong>Mente:</strong> ${result.mindNumber}</p>
-          <p><strong>Anima:</strong> ${result.sacred.number}</p>
-          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
-          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-          <p><em>${result.cycle}</em></p>
+        // Calcolo della "Mente" in base alla posizione del simbolo (da 1 a 20)
+        const mindNumber = sacredDayNames.indexOf(result.sacred.name) + 1;
+        const destinyNumber = result.civil.day + mindNumber + result.sacred.number;
+        
+        // Output aggiornato: per Anima viene mostrato il numero e subito sotto il simbolo (nome del giorno sacro)
+        document.getElementById("destinyNumber").innerHTML = `
+          Spirito: <span style="color: red;">${result.civil.day}</span><br>
+          Mente: <span style="color: lime;">${mindNumber}</span><br>
+          Anima: <span style="color: blue;">${result.sacred.number}</span><br>
+          Simbolo: <span style="color: blue;">${result.sacred.name}</span><br>
+          Numero di Destino: <span style="color: var(--primary-color);">${destinyNumber}</span><br>
+          <em>${result.cycle}</em>
         `;
+        
+        document.querySelectorAll(".grid-container img").forEach(img => {
+          img.classList.remove("selected");
+        });
+        const targetImg = document.querySelector(`.grid-container img[data-sacred-name="${result.sacred.name}"]`);
+        if (targetImg) {
+          targetImg.classList.add("selected");
+        }
+        
+        const synthesisDiv = document.getElementById("synthesis");
+        synthesisDiv.innerHTML = `
+          <h3>Sintesi Personalizzata</h3>
+          <div class="synthesis-box">
+            <p><strong>Mese (Calendario Civile):</strong> Giorno ${result.civil.day} di ${result.civil.month}</p>
+            <p><strong>Dettagli:</strong> ${pdfMonthTexts[result.civil.month] || "Nessun dettaglio disponibile."}</p>
+          </div>
+          <div class="synthesis-box">
+            <h4>Sintesi del Giorno Sacro</h4>
+            <p>Il giorno sacro corrisponde a: <strong>${result.sacred.number}</strong></p>
+            <p>Simbolo: <strong>${result.sacred.name}</strong></p>
+            <p><strong>Descrizione:</strong> ${pdfSacredTexts[result.sacred.name] || "Nessuna descrizione disponibile per questo segno."}</p>
+          </div>
+          <div class="synthesis-box">
+            <h4>Spiegazione dei Numeri</h4>
+            <p><strong>Calendario Civile:</strong> Il numero ${result.civil.day} simboleggia il ciclo vitale e l'andamento dei riti.</p>
+            <p><strong>Calendario Sacro:</strong> Il numero ${result.sacred.number} rappresenta il destino e la sacralità.</p>
+          </div>
+        `;
+        
+        // Aggiorno le onde sinusoidali utilizzando i valori calcolati:
+        // Spirito: giorno civile, Mente: numero del simbolo, Anima: numero sacro
+        updateSineWaves(result.civil.day, mindNumber, result.sacred.number);
       }
+      // Aggiorna anche i dati astronomici in base alla data scelta
+      updateAstronomicalData();
     });
 
-    // Funzione per cercare date in un intervallo con filtri multipli
-    function searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDateStr, endDateStr) {
-      const results = [];
-      let currentDate = new Date(startDateStr);
-      const endDate = new Date(endDateStr);
-      currentDate.setHours(12,0,0,0);
-      endDate.setHours(12,0,0,0);
-      while (currentDate <= endDate) {
-        const conv = computeConversion(currentDate);
-        if (conv.error) {
-          currentDate.setDate(currentDate.getDate() + 1);
-          continue;
-        }
-        let match = true;
-        if (destinyTarget !== null && destinyTarget !== "") {
-          if (conv.destiny !== destinyTarget) match = false;
-        }
-        if (civilTarget !== null && civilTarget !== "") {
-          if (conv.civil.day !== civilTarget) match = false;
-        }
-        if (sacredDayTarget !== null && sacredDayTarget !== "") {
-          if (conv.sacred.number !== sacredDayTarget) match = false;
-        }
-        if (sacredSymbolTarget !== null && sacredSymbolTarget !== "") {
-          if (conv.sacred.name.toLowerCase() !== sacredSymbolTarget.toLowerCase()) match = false;
-        }
-        if (match) {
-          results.push(currentDate.toISOString().split('T')[0]);
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
+    document.getElementById("convertButton2").addEventListener("click", async () => {
+      const inputDate2 = document.getElementById("inputDate2").value;
+      if (!inputDate2) {
+        alert("Per favore, inserisci una data valida per la seconda conversione.");
+        return;
       }
-      return results;
+      const result2 = await convertDate(inputDate2);
+      if (result2.error) {
+        alert(result2.error);
+        return;
+      }
+      const mindNumber2 = sacredDayNames.indexOf(result2.sacred.name) + 1;
+      const destinyNumber2 = result2.civil.day + mindNumber2 + result2.sacred.number;
+      document.getElementById("destinyNumber2").innerHTML = `
+          Spirito: <span style="color: red;">${result2.civil.day}</span><br>
+          Mente: <span style="color: lime;">${mindNumber2}</span><br>
+          Anima: <span style="color: blue;">${result2.sacred.number}</span><br>
+          Simbolo: <span style="color: blue;">${result2.sacred.name}</span><br>
+          Numero di Destino: <span style="color: var(--primary-color);">${destinyNumber2}</span><br>
+          <em>${result2.cycle}</em>
+      `;
+    });
+
+    // ============================
+    // GENERATORE DI BATTITI BINAURALI
+    // ============================
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let oscillators = [];
+    let analyser = null;
+    let masterGain = null;
+
+    function stopOscillators() {
+      oscillators.forEach(osc => {
+        try { osc.stop(); } catch(e) {}
+        osc.disconnect();
+      });
+      oscillators = [];
+      if (analyser) {
+        analyser.disconnect();
+        analyser = null;
+      }
+      if (masterGain) {
+        masterGain.disconnect();
+        masterGain = null;
+      }
     }
 
-    // Gestione dell'evento per la ricerca con filtri multipli
-    document.getElementById("searchButton").addEventListener("click", () => {
-      const destinyValue = document.getElementById("destinyInput").value;
-      const civilValue = document.getElementById("civilInput").value;
-      const sacredDayValue = document.getElementById("sacredDayInput").value;
-      const sacredSymbolValue = document.getElementById("sacredSymbolInput").value;
-      const startDate = document.getElementById("startDate").value;
-      const endDate = document.getElementById("endDate").value;
-      const searchResultsDiv = document.getElementById("searchResults");
+    function createAnalyser() {
+      const newAnalyser = audioCtx.createAnalyser();
+      newAnalyser.fftSize = 2048;
+      return newAnalyser;
+    }
 
-      if (!startDate || !endDate) {
-        alert("Per favore, inserisci la data iniziale e la data finale.");
+    function playSelected() {
+      stopOscillators();
+      const playSpirito = document.getElementById('spiritoCheck').checked;
+      const playMente   = document.getElementById('menteCheck').checked;
+      const playAnima   = document.getElementById('animaCheck').checked;
+      const activeFlags = [playSpirito, playMente, playAnima].filter(v => v);
+      const activeCount = activeFlags.length;
+      if (activeCount === 0) return;
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 1 / activeCount;
+      analyser = createAnalyser();
+      masterGain.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      function createOscillator(frequency, panValue) {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = frequency;
+        const panner = audioCtx.createStereoPanner();
+        panner.pan.value = panValue;
+        osc.connect(panner);
+        panner.connect(masterGain);
+        return osc;
+      }
+
+      if (playSpirito) {
+        const freqSpirito = parseFloat(document.getElementById('spiritoFreq').value);
+        const oscSpirito = createOscillator(freqSpirito, -1);
+        oscillators.push(oscSpirito);
+      }
+      if (playMente) {
+        const freqMente = parseFloat(document.getElementById('menteFreq').value);
+        const oscMente = createOscillator(freqMente, 1);
+        oscillators.push(oscMente);
+      }
+      if (playAnima) {
+        const freqAnima = parseFloat(document.getElementById('animaFreq').value);
+        const oscAnima = createOscillator(freqAnima, 0);
+        oscillators.push(oscAnima);
+      }
+      oscillators.forEach(osc => osc.start());
+    }
+
+    document.getElementById('playBtn').addEventListener('click', playSelected);
+    document.getElementById('stopBtn').addEventListener('click', stopOscillators);
+
+    function encodeMP3(audioBuffer) {
+      const channels = audioBuffer.numberOfChannels;
+      const sampleRate = audioBuffer.sampleRate;
+      const kbps = 128;
+      const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, kbps);
+      const mp3Data = [];
+      const left = audioBuffer.getChannelData(0);
+      const right = channels > 1 ? audioBuffer.getChannelData(1) : left;
+      const blockSize = 1152;
+      
+      for (let i = 0; i < left.length; i += blockSize) {
+        const leftChunk = left.subarray(i, i + blockSize);
+        const rightChunk = channels > 1 ? right.subarray(i, i + blockSize) : leftChunk;
+        const leftBuffer = new Int16Array(leftChunk.length);
+        const rightBuffer = new Int16Array(rightChunk.length);
+        for (let j = 0; j < leftChunk.length; j++) {
+          leftBuffer[j] = (Math.max(-1, Math.min(1, leftChunk[j])) * 32767) | 0;
+          rightBuffer[j] = (Math.max(-1, Math.min(1, rightChunk[j])) * 32767) | 0;
+        }
+        const mp3buf = mp3encoder.encodeBuffer(leftBuffer, rightBuffer);
+        if (mp3buf.length > 0) {
+          mp3Data.push(new Int8Array(mp3buf));
+        }
+      }
+      const endBuf = mp3encoder.flush();
+      if (endBuf.length > 0) {
+        mp3Data.push(new Int8Array(endBuf));
+      }
+      return new Blob(mp3Data, { type: 'audio/mp3' });
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+      stopOscillators();
+      const duration = 30 * 60;
+      const sampleRate = 44100;
+      const totalSamples = duration * sampleRate;
+      const offlineCtx = new OfflineAudioContext(2, totalSamples, sampleRate);
+      const playSpirito = document.getElementById('spiritoCheck').checked;
+      const playMente   = document.getElementById('menteCheck').checked;
+      const playAnima   = document.getElementById('animaCheck').checked;
+      const activeFlags = [playSpirito, playMente, playAnima].filter(v => v);
+      const activeCount = activeFlags.length;
+      if (activeCount === 0) return;
+      const offlineGain = offlineCtx.createGain();
+      offlineGain.gain.value = 1 / activeCount;
+      
+      function createOfflineOscillator(frequency, panValue) {
+        const osc = offlineCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = frequency;
+        const panner = offlineCtx.createStereoPanner();
+        panner.pan.value = panValue;
+        osc.connect(panner);
+        panner.connect(offlineGain);
+        return osc;
+      }
+
+      if (playSpirito) {
+        const freqSpirito = parseFloat(document.getElementById('spiritoFreq').value);
+        const osc = createOfflineOscillator(freqSpirito, -1);
+        osc.start(0);
+        osc.stop(duration);
+      }
+      if (playMente) {
+        const freqMente = parseFloat(document.getElementById('menteFreq').value);
+        const osc = createOfflineOscillator(freqMente, 1);
+        osc.start(0);
+        osc.stop(duration);
+      }
+      if (playAnima) {
+        const freqAnima = parseFloat(document.getElementById('animaFreq').value);
+        const osc = createOfflineOscillator(freqAnima, 0);
+        osc.start(0);
+        osc.stop(duration);
+      }
+      
+      offlineGain.connect(offlineCtx.destination);
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = 'Rendering audio offline (30 minuti), attendere...';
+      
+      offlineCtx.startRendering().then(function(renderedBuffer) {
+        statusDiv.textContent = 'Codifica in MP3 in corso, attendere...';
+        const mp3Blob = encodeMP3(renderedBuffer);
+        const url = URL.createObjectURL(mp3Blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = 'binaural_beats_30min.mp3';
+        downloadLink.textContent = 'Clicca qui per scaricare il file MP3 (30 minuti)';
+        statusDiv.innerHTML = '';
+        statusDiv.appendChild(downloadLink);
+      }).catch(function(err) {
+        statusDiv.textContent = 'Errore nel rendering: ' + err;
+      });
+    });
+
+    // ============================
+    // ANIMAZIONE DEL VISUALIZER
+    // ============================
+    function animate() {
+      const canvas = document.getElementById('visualizer');
+      const canvasCtx = canvas.getContext('2d');
+      const WIDTH = canvas.width;
+      const HEIGHT = canvas.height;
+      
+      canvasCtx.fillStyle = '#121212';
+      canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+      
+      if (!analyser) {
+        requestAnimationFrame(animate);
         return;
       }
       
-      const destinyTarget = destinyValue ? parseInt(destinyValue) : "";
-      const civilTarget = civilValue ? parseInt(civilValue) : "";
-      const sacredDayTarget = sacredDayValue ? parseInt(sacredDayValue) : "";
-      const sacredSymbolTarget = sacredSymbolValue ? sacredSymbolValue.trim() : "";
+      const bufferLength = analyser.fftSize;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
       
-      const datesFound = searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDate, endDate);
-      if (datesFound.length === 0) {
-        searchResultsDiv.innerHTML = "<p>Nessuna data trovata con i criteri inseriti.</p>";
-      } else {
-        searchResultsDiv.innerHTML = "<p>Date trovate:</p><ul>" +
-          datesFound.map(date => `<li>${date}</li>`).join('') +
-          "</ul>";
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = '#00ffff';
+      canvasCtx.beginPath();
+      
+      const sliceWidth = WIDTH / bufferLength;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = v * HEIGHT / 2;
+        if (i === 0) {
+          canvasCtx.moveTo(x, y);
+        } else {
+          canvasCtx.lineTo(x, y);
+        }
+        x += sliceWidth;
       }
-    });
+      canvasCtx.lineTo(WIDTH, HEIGHT / 2);
+      canvasCtx.stroke();
+      
+      requestAnimationFrame(animate);
+    }
+
+    function resizeCanvas() {
+      const canvas = document.getElementById('visualizer');
+      canvas.width = document.getElementById('visualizerContainer').clientWidth;
+      canvas.height = 300;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    animate();
   </script>
 </body>
 </html>
-
