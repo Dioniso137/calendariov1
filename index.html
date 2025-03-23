@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Convertitore Calendario e Dati Astronomici</title>
+  <title>Convertitore Calendario</title>
   <style>
     /* Reset base */
     *, *::before, *::after {
@@ -12,91 +12,102 @@
       padding: 0;
     }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: Arial, sans-serif;
       background: #fff;
       color: #000;
-      line-height: 1.6;
       padding: 20px;
     }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 0 20px;
+    /* Banner scorrevole */
+    .banner-container {
+      width: 100%;
+      overflow: hidden;
+      background: #000;
+      color: #fff;
+      padding: 10px 0;
+      margin-bottom: 20px;
     }
-    .section {
+    .banner-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollText 15s linear infinite;
+      font-size: 1rem;
+      padding-left: 100%;
+    }
+    @keyframes scrollText {
+      0% {
+        transform: translateX(0%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+    /* Sezione convertitore */
+    .converter-section {
+      max-width: 400px;
+      margin: 0 auto;
       background: #f4f4f4;
       border: 1px solid #ddd;
       border-radius: 8px;
       padding: 20px;
-      margin-bottom: 20px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    h1, h2 {
+    .converter-section h1 {
       text-align: center;
       margin-bottom: 15px;
     }
-    p {
-      margin-bottom: 10px;
-      font-size: 1rem;
-    }
-    input[type="date"],
-    button {
+    .converter-section input[type="date"],
+    .converter-section button {
       width: 100%;
       padding: 12px;
-      margin: 10px 0;
+      margin-bottom: 10px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    button {
+    .converter-section button {
       background: #000;
       color: #fff;
       border: none;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-    button:hover {
+    .converter-section button:hover {
       background: #333;
     }
-    /* Responsive per dispositivi mobili */
+    /* Responsive */
     @media (max-width: 600px) {
       body {
         padding: 10px;
       }
-      .container {
-        padding: 10px;
+      .converter-section {
+        padding: 15px;
       }
-      input, button {
-        padding: 10px;
+      .banner-content {
         font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Sezione Conversione Calendario -->
-    <section id="conversione" class="section">
-      <h1>Convertitore Calendario</h1>
-      <p>Inserisci una data del calendario gregoriano:</p>
-      <input type="date" id="inputDate">
-      <button id="convertButton">Converti</button>
-      <div id="result"></div>
-    </section>
-
-    <!-- Sezione Dati della Luna e del Sole -->
-    <section id="astronomia" class="section">
-      <h2>Dati della Luna e del Sole</h2>
-      <p><strong>Luna:</strong> Fase attuale: <span id="moonPhase">-</span></p>
-      <p><strong>Sole:</strong> Alba: <span id="sunrise">-</span> - Tramonto: <span id="sunset">-</span></p>
-    </section>
+  <!-- Banner scorrevole per mostrare i dati convertiti -->
+  <div class="banner-container">
+    <div class="banner-content" id="scrollBanner">
+      Converti una data per vedere i dati del giorno...
+    </div>
   </div>
-
+  
+  <!-- Sezione Convertitore Calendario -->
+  <div class="converter-section">
+    <h1>Convertitore Calendario</h1>
+    <input type="date" id="inputDate">
+    <button id="convertButton">Converti</button>
+    <div id="result"></div>
+  </div>
+  
   <script>
     // Date base per la conversione
     const baseDate1965 = new Date(1965, 1, 21);
     const baseDate1913 = new Date(1913, 1, 21);
-
+  
     // Funzione per calcolare il giorno dell'anno (ignorando gli anni bisestili)
     function getNonLeapDayOfYear(date) {
       const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -107,10 +118,10 @@
       dayOfYear += date.getDate();
       return dayOfYear;
     }
-
+  
     // Array dei mesi civili
     const civilMonths = [
-      { name: "Atlcahualo (o Cuauhitlehua)", days: 20 },
+      { name: "Atlcahualo", days: 20 },
       { name: "Tlacaxipehualiztli", days: 20 },
       { name: "Tozoztontli", days: 20 },
       { name: "Huey Tozoztontli", days: 20 },
@@ -129,32 +140,15 @@
       { name: "Tititl", days: 20 },
       { name: "Izcalli", days: 20 }
     ];
-    const nemontemiDays = 5;
-
+  
     // Array dei nomi sacri
     const sacredDayNames = [
-      "Cipactli (Coccodrillo)",
-      "Ehecatl (Vento)",
-      "Calli (Casa)",
-      "Cuetzpalin (Lucertola)",
-      "Coatl (Serpente)",
-      "Miquiztli (Morte)",
-      "Mazatl (Cervo)",
-      "Tochtli (Coniglio)",
-      "Atl (Acqua)",
-      "Itzcuintli (Cane)",
-      "Ozomahtli (Scimmia)",
-      "Malinalli (Erba)",
-      "Acatl (Canna)",
-      "Ocelotl (Giaguaro)",
-      "Cuauhtli (Aquila)",
-      "Cozcacuauhtli (Avvoltoio)",
-      "Ollin (Movimento)",
-      "Tecpatl (Coltello di selce)",
-      "Quiahuitl (Pioggia)",
-      "Xochitl (Fiore)"
+      "Cipactli", "Ehecatl", "Calli", "Cuetzpalin", "Coatl", "Miquiztli",
+      "Mazatl", "Tochtli", "Atl", "Itzcuintli", "Ozomahtli", "Malinalli",
+      "Acatl", "Ocelotl", "Cuauhtli", "Cozcacuauhtli", "Ollin", "Tecpatl",
+      "Quiahuitl", "Xochitl"
     ];
-
+  
     // Funzione per ottenere il numero del mese civile (per visualizzazione)
     function getMonthNumber(civilMonthName) {
       for (let i = 0; i < civilMonths.length; i++) {
@@ -164,7 +158,7 @@
       }
       return 0;
     }
-
+  
     // Funzione per calcolare la conversione e il Numero di Destino
     function computeConversion(inputDate) {
       const selectedDate = new Date(inputDate);
@@ -177,7 +171,7 @@
       const selectedDOY = getNonLeapDayOfYear(selectedDate);
       const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
       const diff = yearDiff * 365 + (selectedDOY - baseDOY);
-
+  
       // Calcolo del giorno civile
       const civilDay = diff % 365;
       let remainingDays = civilDay;
@@ -193,17 +187,17 @@
         }
       }
       if (civilMonthName === "") {
-        civilMonthName = "Nemontemi (5 giorni infausti)";
+        civilMonthName = "Nemontemi";
         civilDayNumber = remainingDays + 1;
       }
-
+  
       const sacredDayIndex = diff % 260;
       const sacredNumber = (sacredDayIndex % 13) + 1;
       const sacredName = sacredDayNames[sacredDayIndex % 20];
       const cycleUsed = (selectedDate < baseDate1965) ? "Ciclo 1913" : "Ciclo 1965";
       const mindNumber = sacredDayNames.indexOf(sacredName) + 1;
       const destinyNumber = civilDayNumber + mindNumber + sacredNumber;
-
+  
       return {
         civil: { month: civilMonthName, day: civilDayNumber },
         sacred: { number: sacredNumber, name: sacredName },
@@ -212,46 +206,19 @@
         destiny: destinyNumber
       };
     }
-
-    // Funzione per aggiornare i dati della Luna e del Sole in base alla data scelta
-    function updateAstroData(date) {
-      // Calcolo della fase lunare (approssimato)
-      const lp = 2551443; // durata di un ciclo lunare in secondi (approssimato)
-      const now = date.getTime() / 1000;
-      const newMoonEpoch = new Date(1970, 0, 7, 20, 35, 0).getTime() / 1000;
-      const phase = ((now - newMoonEpoch) % lp) / lp;
-      let moonPhase;
-      if (phase < 0.02 || phase > 0.98) {
-        moonPhase = "Novilunio";
-      } else if (phase < 0.25) {
-        moonPhase = "Crescente";
-      } else if (phase < 0.5) {
-        moonPhase = "Gibbosa crescente";
-      } else if (phase < 0.75) {
-        moonPhase = "Gibbosa calante";
+  
+    // Funzione per aggiornare il banner scorrevole
+    function updateBanner(result) {
+      const banner = document.getElementById("scrollBanner");
+      if (result.error) {
+        banner.textContent = result.error;
       } else {
-        moonPhase = "Calante";
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        banner.textContent = `Spirito: ${result.civil.day} | Mente: ${result.mindNumber} | Anima: ${result.sacred.number} | Simbolo: ${result.sacred.name} | Mese Civile: ${civilMonthNumber} - ${result.civil.month} | Numero di Destino: ${result.destiny} | ${result.cycle}`;
       }
-      document.getElementById("moonPhase").textContent = moonPhase;
-      
-      // Calcolo approssimativo di alba e tramonto basato sul mese
-      const month = date.getMonth();
-      let sunrise, sunset;
-      if (month === 11 || month === 0 || month === 1) {
-        sunrise = "07:00";
-        sunset = "17:00";
-      } else if (month >= 4 && month <= 6) {
-        sunrise = "05:30";
-        sunset = "20:00";
-      } else {
-        sunrise = "06:30";
-        sunset = "19:00";
-      }
-      document.getElementById("sunrise").textContent = sunrise;
-      document.getElementById("sunset").textContent = sunset;
     }
-
-    // Gestione dell'evento per la conversione e l'aggiornamento dei dati astronomici
+  
+    // Gestione del pulsante "Converti"
     document.getElementById("convertButton").addEventListener("click", () => {
       const inputDate = document.getElementById("inputDate").value;
       const resultDiv = document.getElementById("result");
@@ -262,20 +229,19 @@
       const result = computeConversion(inputDate);
       if (result.error) {
         alert(result.error);
+        resultDiv.innerHTML = "";
       } else {
-        const civilMonthNumber = getMonthNumber(result.civil.month);
         resultDiv.innerHTML = `
           <p><strong>Spirito:</strong> ${result.civil.day}</p>
           <p><strong>Mente:</strong> ${result.mindNumber}</p>
           <p><strong>Anima:</strong> ${result.sacred.number}</p>
           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+          <p><strong>Mese Civile:</strong> ${getMonthNumber(result.civil.month)} - ${result.civil.month}</p>
           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
           <p><em>${result.cycle}</em></p>
         `;
-        // Aggiorna i dati della Luna e del Sole in base alla data scelta
-        updateAstroData(new Date(inputDate));
       }
+      updateBanner(result);
     });
   </script>
 </body>
