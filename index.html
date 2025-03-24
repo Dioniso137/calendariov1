@@ -38,7 +38,21 @@
       0% { transform: translateX(0%); }
       100% { transform: translateX(-100%); }
     }
-    /* Sezione Convertitore */
+    /* Sezione Conversione Live del Giorno */
+    .live-conversion-section {
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+      background: #e8e8e8;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .live-conversion-section h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    /* Sezione Convertitore Calendario */
     .converter-section {
       max-width: 400px;
       margin: 0 auto 20px auto;
@@ -89,7 +103,7 @@
       body {
         padding: 10px;
       }
-      .converter-section, .astro-section {
+      .converter-section, .astro-section, .live-conversion-section {
         padding: 15px;
       }
       .banner-content {
@@ -103,11 +117,17 @@
   </style>
 </head>
 <body>
-  <!-- Banner scorrevole con conversione della data odierna -->
+  <!-- Banner scorrevole con sintesi della conversione odierna -->
   <div class="banner-container">
     <div class="banner-content" id="scrollBanner">
-      Caricamento dati di oggi...
+      Caricamento conversione del giorno...
     </div>
+  </div>
+
+  <!-- Sezione Conversione Live del Giorno -->
+  <div class="live-conversion-section">
+    <h2>Conversione Live del Giorno</h2>
+    <div id="liveConversion">Caricamento conversione live...</div>
   </div>
 
   <!-- Sezione Convertitore Calendario -->
@@ -229,7 +249,7 @@
       };
     }
 
-    // Aggiorna il banner scorrevole con la conversione della data odierna
+    // Aggiorna il banner scorrevole con la conversione della data odierna (sintesi)
     function updateBannerWithToday() {
       const today = new Date();
       const result = computeConversion(today);
@@ -237,8 +257,28 @@
       if (result.error) {
         banner.textContent = result.error;
       } else {
+        banner.textContent = `Conversione del Giorno (${today.toLocaleDateString()}): Spirito ${result.civil.day}, Mente ${result.mindNumber}, Anima ${result.sacred.number} (${result.sacred.name}), Destino ${result.destiny} | ${result.cycle}`;
+      }
+    }
+
+    // Aggiorna la sezione Conversione Live del Giorno
+    function updateLiveConversion() {
+      const today = new Date();
+      const result = computeConversion(today);
+      const liveDiv = document.getElementById("liveConversion");
+      if (result.error) {
+        liveDiv.textContent = result.error;
+      } else {
         const civilMonthNumber = getMonthNumber(result.civil.month);
-        banner.textContent = `Oggi (${today.toLocaleDateString()}): Spirito ${result.civil.day} | Mente ${result.mindNumber} | Anima ${result.sacred.number} | Simbolo ${result.sacred.name} | Mese Civile ${civilMonthNumber} - ${result.civil.month} | Destino ${result.destiny} | ${result.cycle}`;
+        liveDiv.innerHTML = `
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Mente:</strong> ${result.mindNumber}</p>
+          <p><strong>Anima:</strong> ${result.sacred.number}</p>
+          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+          <p><em>${result.cycle}</em></p>
+        `;
       }
     }
 
@@ -271,32 +311,112 @@
     // Funzione per aggiornare i dati astronomici
     function updateAstroData() {
       const now = new Date();
-      // Simula la fase della luna basata sul giorno del mese (ciclo di 8 fasi)
-      const moonPhases = ["Novilunio", "Crescente", "Primo Quarto", "Gibbosa Crescente", "Piena", "Gibbosa Calante", "Ultimo Quarto", "Calante"];
-      const phaseIndex = now.getDate() % moonPhases.length;
-      const moonPhase = moonPhases[phaseIndex];
+      // API per alba e tramonto (esempio: Roma)
+      const apiUrl = "https://api.sunrise-sunset.org/json?lat=41.9028&lng=12.4964&formatted=0&date=" + now.toISOString().split('T')[0];
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "OK") {
+            const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
+            const sunriseUTC = new Date(data.results.sunrise);
+            const sunsetUTC = new Date(data.results.sunset);
+            const sunrise = sunriseUTC.toLocaleTimeString('it-IT', options);
+            const sunset = sunsetUTC.toLocaleTimeString('it-IT', options);
+            // Ora, per la fase lunare proviamo ad usare un'API esterna...
+            updateMoonPhase(sunrise, sunset, now);
+          } else {
+            document.getElementById("astroData").innerHTML = "<p>Errore nel recupero dati solari.</p>";
+          }
+        })
+        .catch(error => {
+          console.error("Errore nel fetch dei dati solari:", error);
+          document.getElementById("astroData").innerHTML = "<p>Errore nel recupero dati astronomici.</p>";
+        });
+    }
 
-      // Simula i dati del sole (valori statici di esempio)
-      const sunrise = "06:00";
-      const sunset = "18:00";
+    // Funzione per aggiornare la fase lunare usando un'API esterna con fallback
+    function updateMoonPhase(sunrise, sunset, now) {
+      const days = Math.floor(now.getTime() / 86400000);
+      const moonApiUrl = "https://api.farmsense.net/v1/moonphases/?d=" + days;
+      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
+      fetch(moonApiUrl)
+        .then(response => response.json())
+        .then(moonData => {
+          if (moonData && moonData.length > 0) {
+            const phaseInfo = moonData[0]; // utilizziamo il primo elemento
+            const moonPhaseName = phaseInfo.Phase;
+            // Se l'API restituisce una data (es. in "Date"), la convertiamo;
+            // altrimenti, utilizziamo l'ora attuale come riferimento approssimato.
+            let phaseStart;
+            if (phaseInfo.Date) {
+              phaseStart = new Date(phaseInfo.Date).toLocaleTimeString('it-IT', options);
+            } else {
+              phaseStart = now.toLocaleTimeString('it-IT', options);
+            }
+            const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById("astroData").innerHTML = `
+              <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+              <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+              <p><strong>Ora attuale:</strong> ${currentTime}</p>
+            `;
+          } else {
+            fallbackMoonPhase(sunrise, sunset, now);
+          }
+        })
+        .catch(error => {
+          console.error("Errore nel fetch per fase lunare:", error);
+          fallbackMoonPhase(sunrise, sunset, now);
+        });
+    }
 
-      // Mostra anche l'ora attuale per dare senso di live update
-      const currentTime = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-      const astroDiv = document.getElementById("astroData");
-      astroDiv.innerHTML = `
-        <p><strong>Luna:</strong> Fase: ${moonPhase}</p>
+    // Fallback per la fase lunare (calcolo approssimativo)
+    function fallbackMoonPhase(sunrise, sunset, now) {
+      const synodicMonth = 29.53058867;
+      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0)); // data approssimativa del novilunio
+      let phase = ((now.getTime() - knownNewMoon.getTime()) / 86400000) % synodicMonth;
+      if (phase < 0) phase += synodicMonth;
+      let moonPhaseName = "";
+      if (phase < 1.84566) {
+        moonPhaseName = "Novilunio";
+      } else if (phase < 5.53699) {
+        moonPhaseName = "Crescente";
+      } else if (phase < 9.22831) {
+        moonPhaseName = "Primo Quarto";
+      } else if (phase < 12.91963) {
+        moonPhaseName = "Gibbosa Crescente";
+      } else if (phase < 16.61096) {
+        moonPhaseName = "Piena";
+      } else if (phase < 20.30228) {
+        moonPhaseName = "Gibbosa Calante";
+      } else if (phase < 23.99361) {
+        moonPhaseName = "Ultimo Quarto";
+      } else if (phase < 27.68493) {
+        moonPhaseName = "Calante";
+      } else {
+        moonPhaseName = "Novilunio";
+      }
+      // In assenza di dati precisi, mostriamo l'orario attuale come riferimento
+      const phaseStart = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+      const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+      document.getElementById("astroData").innerHTML = `
+        <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
         <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
         <p><strong>Ora attuale:</strong> ${currentTime}</p>
       `;
     }
 
-    // Inizializza il banner con la conversione odierna al caricamento della pagina
+    // Inizializza il banner e la conversione live al caricamento della pagina
     updateBannerWithToday();
+    updateLiveConversion();
 
     // Aggiorna i dati astronomici all'avvio e poi ogni minuto
     updateAstroData();
     setInterval(updateAstroData, 60000);
+    // Aggiorna la conversione live ogni minuto
+    setInterval(() => {
+      updateBannerWithToday();
+      updateLiveConversion();
+    }, 60000);
   </script>
 </body>
 </html>
