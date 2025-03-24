@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Convertitore Calendario & Dati Astronomici Live</title>
+  <title>Convertitore Calendario, Ricerca e Dati Astronomici Live</title>
   <style>
     /* Reset base */
     *, *::before, *::after {
@@ -12,102 +12,65 @@
       padding: 0;
     }
     body {
-      font-family: Arial, sans-serif;
-      background: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fff;
       color: #000;
       padding: 20px;
       line-height: 1.6;
     }
-    /* Banner scorrevole (conversione odierna) */
-    .banner-container {
-      width: 100%;
-      overflow: hidden;
-      background: #000;
-      color: #fff;
-      padding: 10px 0;
-      margin-bottom: 20px;
-    }
-    .banner-content {
-      display: inline-block;
-      white-space: nowrap;
-      animation: scrollText 15s linear infinite;
-      font-size: 1rem;
-      padding-left: 100%;
-    }
-    @keyframes scrollText {
-      0% { transform: translateX(0%); }
-      100% { transform: translateX(-100%); }
-    }
-    /* Sezione Conversione Live del Giorno */
-    .live-conversion-section {
-      max-width: 400px;
-      margin: 0 auto 20px auto;
-      background: #e8e8e8;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       padding: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    .live-conversion-section h2 {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-    /* Sezione Convertitore Calendario */
-    .converter-section {
-      max-width: 400px;
-      margin: 0 auto 20px auto;
-      background: #f4f4f4;
+    .section {
+      background: #f9f9f9;
       border: 1px solid #ddd;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 20px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    .converter-section h1 {
+    h1, h2 {
       text-align: center;
       margin-bottom: 15px;
     }
-    .converter-section input[type="date"],
-    .converter-section button {
+    p {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    input[type="date"],
+    input[type="number"],
+    input[type="text"],
+    button {
       width: 100%;
-      padding: 12px;
+      padding: 12px 15px;
       margin-bottom: 10px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    .converter-section button {
+    button {
       background: #000;
       color: #fff;
       border: none;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .converter-section button:hover {
+    button:hover {
       background: #333;
     }
-    /* Sezione Dati Astronomici Live */
-    .astro-section {
-      max-width: 400px;
-      margin: 0 auto;
-      background: #f4f4f4;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      text-align: center;
+    #result, #searchResults {
+      margin-top: 10px;
     }
-    .astro-section h2 {
-      margin-bottom: 15px;
-    }
-    /* Responsive */
     @media (max-width: 600px) {
       body {
         padding: 10px;
       }
-      .converter-section, .astro-section, .live-conversion-section {
-        padding: 15px;
-      }
-      .banner-content {
-        font-size: 0.9rem;
+      .container {
+        padding: 10px;
       }
       input, button {
         padding: 10px;
@@ -117,40 +80,54 @@
   </style>
 </head>
 <body>
-  <!-- Banner scorrevole con sintesi della conversione odierna -->
-  <div class="banner-container">
-    <div class="banner-content" id="scrollBanner">
-      Caricamento conversione del giorno...
+  <div class="container">
+    <!-- Sezione Conversione Live del Giorno -->
+    <div class="section" id="liveConversionSection">
+      <h2>Conversione Live del Giorno</h2>
+      <div id="liveConversion">Caricamento conversione live...</div>
+    </div>
+
+    <!-- Sezione Convertitore Calendario -->
+    <div class="section" id="converterSection">
+      <h1>Convertitore Calendario</h1>
+      <p>Inserisci una data del calendario gregoriano:</p>
+      <input type="date" id="inputDate">
+      <button id="convertButton">Converti</button>
+      <div id="result"></div>
+    </div>
+
+    <!-- Sezione Cerca Date per Numero di Destino e Filtri -->
+    <div class="section" id="destinySearchSection">
+      <h2>Cerca Date per Numero di Destino e Filtri</h2>
+      <p>Inserisci il Numero di Destino (opzionale):</p>
+      <input type="number" id="destinyInput" placeholder="Numero di Destino (3 - 53)" min="3" max="53">
+      <p>Inserisci il Numero del Giorno Civile (opzionale):</p>
+      <input type="number" id="civilInput" placeholder="Giorno Civile">
+      <p>Inserisci il Numero del Giorno Sacro (opzionale):</p>
+      <input type="number" id="sacredDayInput" placeholder="Giorno Sacro">
+      <p>Inserisci il Simbolo Sacro (opzionale):</p>
+      <input type="text" id="sacredSymbolInput" placeholder="Simbolo Sacro">
+      <p>Data Iniziale:</p>
+      <input type="date" id="startDate">
+      <p>Data Finale:</p>
+      <input type="date" id="endDate">
+      <button id="searchButton">Cerca Date</button>
+      <div id="searchResults"></div>
+    </div>
+
+    <!-- Sezione Dati Astronomici Live -->
+    <div class="section" id="astroSection">
+      <h2>Dati Astronomici Live</h2>
+      <div id="astroData">Caricamento dati astronomici...</div>
     </div>
   </div>
 
-  <!-- Sezione Conversione Live del Giorno -->
-  <div class="live-conversion-section">
-    <h2>Conversione Live del Giorno</h2>
-    <div id="liveConversion">Caricamento conversione live...</div>
-  </div>
-
-  <!-- Sezione Convertitore Calendario -->
-  <div class="converter-section">
-    <h1>Convertitore Calendario</h1>
-    <input type="date" id="inputDate">
-    <button id="convertButton">Converti Data Selezionata</button>
-    <div id="result"></div>
-  </div>
-
-  <!-- Sezione Dati Astronomici Live (Luna e Sole) -->
-  <div class="astro-section">
-    <h2>Dati Astronomici Live</h2>
-    <div id="astroData">Caricamento dati astronomici...</div>
-  </div>
-
   <script>
-    /***************** CONVERSIONE CALENDARIO *****************/
     // Date base per la conversione
     const baseDate1965 = new Date(1965, 1, 21);
     const baseDate1913 = new Date(1913, 1, 21);
 
-    // Calcola il giorno dell'anno (ignorando gli anni bisestili)
+    // Funzione per calcolare il giorno dell'anno (ignorando gli anni bisestili)
     function getNonLeapDayOfYear(date) {
       const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
       let dayOfYear = 0;
@@ -161,9 +138,9 @@
       return dayOfYear;
     }
 
-    // Array dei mesi civili (nomi semplificati)
+    // Array dei mesi civili
     const civilMonths = [
-      { name: "Atlcahualo", days: 20 },
+      { name: "Atlcahualo (o Cuauhitlehua)", days: 20 },
       { name: "Tlacaxipehualiztli", days: 20 },
       { name: "Tozoztontli", days: 20 },
       { name: "Huey Tozoztontli", days: 20 },
@@ -183,15 +160,31 @@
       { name: "Izcalli", days: 20 }
     ];
 
-    // Array dei nomi sacri (semplificato)
+    // Array dei nomi sacri
     const sacredDayNames = [
-      "Cipactli", "Ehecatl", "Calli", "Cuetzpalin", "Coatl", "Miquiztli",
-      "Mazatl", "Tochtli", "Atl", "Itzcuintli", "Ozomahtli", "Malinalli",
-      "Acatl", "Ocelotl", "Cuauhtli", "Cozcacuauhtli", "Ollin", "Tecpatl",
-      "Quiahuitl", "Xochitl"
+      "Cipactli (Coccodrillo)",
+      "Ehecatl (Vento)",
+      "Calli (Casa)",
+      "Cuetzpalin (Lucertola)",
+      "Coatl (Serpente)",
+      "Miquiztli (Morte)",
+      "Mazatl (Cervo)",
+      "Tochtli (Coniglio)",
+      "Atl (Acqua)",
+      "Itzcuintli (Cane)",
+      "Ozomahtli (Scimmia)",
+      "Malinalli (Erba)",
+      "Acatl (Canna)",
+      "Ocelotl (Giaguaro)",
+      "Cuauhtli (Aquila)",
+      "Cozcacuauhtli (Avvoltoio)",
+      "Ollin (Movimento)",
+      "Tecpatl (Coltello di selce)",
+      "Quiahuitl (Pioggia)",
+      "Xochitl (Fiore)"
     ];
 
-    // Restituisce il numero del mese civile (per visualizzazione)
+    // Funzione per ottenere il numero del mese civile (per visualizzazione)
     function getMonthNumber(civilMonthName) {
       for (let i = 0; i < civilMonths.length; i++) {
         if (civilMonths[i].name === civilMonthName) {
@@ -201,7 +194,7 @@
       return 0;
     }
 
-    // Calcola la conversione e il Numero di Destino per una data
+    // Funzione per calcolare la conversione e il Numero di Destino
     function computeConversion(inputDate) {
       const selectedDate = new Date(inputDate);
       selectedDate.setHours(12, 0, 0, 0);
@@ -214,7 +207,7 @@
       const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
       const diff = yearDiff * 365 + (selectedDOY - baseDOY);
 
-      // Calcola il giorno civile
+      // Calcolo del giorno civile
       const civilDay = diff % 365;
       let remainingDays = civilDay;
       let civilMonthName = "";
@@ -228,8 +221,8 @@
           remainingDays -= civilMonths[i].days;
         }
       }
-      if (!civilMonthName) {
-        civilMonthName = "Nemontemi";
+      if (civilMonthName === "") {
+        civilMonthName = "Nemontemi (5 giorni infausti)";
         civilDayNumber = remainingDays + 1;
       }
 
@@ -249,19 +242,96 @@
       };
     }
 
-    // Aggiorna il banner scorrevole con la conversione della data odierna (sintesi)
-    function updateBannerWithToday() {
-      const today = new Date();
-      const result = computeConversion(today);
-      const banner = document.getElementById("scrollBanner");
-      if (result.error) {
-        banner.textContent = result.error;
-      } else {
-        banner.textContent = `Conversione del Giorno (${today.toLocaleDateString()}): Spirito ${result.civil.day}, Mente ${result.mindNumber}, Anima ${result.sacred.number} (${result.sacred.name}), Destino ${result.destiny} | ${result.cycle}`;
+    // Gestione della conversione per la data selezionata
+    document.getElementById("convertButton").addEventListener("click", () => {
+      const inputDate = document.getElementById("inputDate").value;
+      const resultDiv = document.getElementById("result");
+      if (!inputDate) {
+        alert("Per favore, inserisci una data valida.");
+        return;
       }
+      const result = computeConversion(inputDate);
+      if (result.error) {
+        alert(result.error);
+      } else {
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        resultDiv.innerHTML = `
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Mente:</strong> ${result.mindNumber}</p>
+          <p><strong>Anima:</strong> ${result.sacred.number}</p>
+          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+          <p><em>${result.cycle}</em></p>
+        `;
+      }
+    });
+
+    // Funzione per cercare date in un intervallo con filtri multipli
+    function searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDateStr, endDateStr) {
+      const results = [];
+      let currentDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+      currentDate.setHours(12,0,0,0);
+      endDate.setHours(12,0,0,0);
+      while (currentDate <= endDate) {
+        const conv = computeConversion(currentDate);
+        if (conv.error) {
+          currentDate.setDate(currentDate.getDate() + 1);
+          continue;
+        }
+        let match = true;
+        if (destinyTarget !== null && destinyTarget !== "") {
+          if (conv.destiny !== destinyTarget) match = false;
+        }
+        if (civilTarget !== null && civilTarget !== "") {
+          if (conv.civil.day !== civilTarget) match = false;
+        }
+        if (sacredDayTarget !== null && sacredDayTarget !== "") {
+          if (conv.sacred.number !== sacredDayTarget) match = false;
+        }
+        if (sacredSymbolTarget !== null && sacredSymbolTarget !== "") {
+          if (conv.sacred.name.toLowerCase() !== sacredSymbolTarget.toLowerCase()) match = false;
+        }
+        if (match) {
+          results.push(currentDate.toISOString().split('T')[0]);
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return results;
     }
 
-    // Aggiorna la sezione Conversione Live del Giorno
+    // Gestione dell'evento per la ricerca con filtri multipli
+    document.getElementById("searchButton").addEventListener("click", () => {
+      const destinyValue = document.getElementById("destinyInput").value;
+      const civilValue = document.getElementById("civilInput").value;
+      const sacredDayValue = document.getElementById("sacredDayInput").value;
+      const sacredSymbolValue = document.getElementById("sacredSymbolInput").value;
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      const searchResultsDiv = document.getElementById("searchResults");
+
+      if (!startDate || !endDate) {
+        alert("Per favore, inserisci la data iniziale e la data finale.");
+        return;
+      }
+      
+      const destinyTarget = destinyValue ? parseInt(destinyValue) : "";
+      const civilTarget = civilValue ? parseInt(civilValue) : "";
+      const sacredDayTarget = sacredDayValue ? parseInt(sacredDayValue) : "";
+      const sacredSymbolTarget = sacredSymbolValue ? sacredSymbolValue.trim() : "";
+      
+      const datesFound = searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDate, endDate);
+      if (datesFound.length === 0) {
+        searchResultsDiv.innerHTML = "<p>Nessuna data trovata con i criteri inseriti.</p>";
+      } else {
+        searchResultsDiv.innerHTML = "<p>Date trovate:</p><ul>" +
+          datesFound.map(date => `<li>${date}</li>`).join('') +
+          "</ul>";
+      }
+    });
+
+    // Aggiornamento della conversione live
     function updateLiveConversion() {
       const today = new Date();
       const result = computeConversion(today);
@@ -282,32 +352,6 @@
       }
     }
 
-    // Gestione della conversione per la data selezionata
-    document.getElementById("convertButton").addEventListener("click", () => {
-      const inputDate = document.getElementById("inputDate").value;
-      const resultDiv = document.getElementById("result");
-      if (!inputDate) {
-        alert("Per favore, inserisci una data valida.");
-        return;
-      }
-      const result = computeConversion(inputDate);
-      if (result.error) {
-        alert(result.error);
-        resultDiv.innerHTML = "";
-      } else {
-        resultDiv.innerHTML = `
-          <p><strong>Spirito:</strong> ${result.civil.day}</p>
-          <p><strong>Mente:</strong> ${result.mindNumber}</p>
-          <p><strong>Anima:</strong> ${result.sacred.number}</p>
-          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-          <p><strong>Mese Civile:</strong> ${getMonthNumber(result.civil.month)} - ${result.civil.month}</p>
-          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-          <p><em>${result.cycle}</em></p>
-        `;
-      }
-    });
-
-    /***************** DATI ASTRONOMICI LIVE *****************/
     // Funzione per aggiornare i dati astronomici
     function updateAstroData() {
       const now = new Date();
@@ -322,7 +366,6 @@
             const sunsetUTC = new Date(data.results.sunset);
             const sunrise = sunriseUTC.toLocaleTimeString('it-IT', options);
             const sunset = sunsetUTC.toLocaleTimeString('it-IT', options);
-            // Ora, per la fase lunare proviamo ad usare un'API esterna...
             updateMoonPhase(sunrise, sunset, now);
           } else {
             document.getElementById("astroData").innerHTML = "<p>Errore nel recupero dati solari.</p>";
@@ -343,10 +386,8 @@
         .then(response => response.json())
         .then(moonData => {
           if (moonData && moonData.length > 0) {
-            const phaseInfo = moonData[0]; // utilizziamo il primo elemento
+            const phaseInfo = moonData[0];
             const moonPhaseName = phaseInfo.Phase;
-            // Se l'API restituisce una data (es. in "Date"), la convertiamo;
-            // altrimenti, utilizziamo l'ora attuale come riferimento approssimato.
             let phaseStart;
             if (phaseInfo.Date) {
               phaseStart = new Date(phaseInfo.Date).toLocaleTimeString('it-IT', options);
@@ -372,7 +413,7 @@
     // Fallback per la fase lunare (calcolo approssimativo)
     function fallbackMoonPhase(sunrise, sunset, now) {
       const synodicMonth = 29.53058867;
-      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0)); // data approssimativa del novilunio
+      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
       let phase = ((now.getTime() - knownNewMoon.getTime()) / 86400000) % synodicMonth;
       if (phase < 0) phase += synodicMonth;
       let moonPhaseName = "";
@@ -395,7 +436,6 @@
       } else {
         moonPhaseName = "Novilunio";
       }
-      // In assenza di dati precisi, mostriamo l'orario attuale come riferimento
       const phaseStart = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       document.getElementById("astroData").innerHTML = `
@@ -405,17 +445,14 @@
       `;
     }
 
-    // Inizializza il banner e la conversione live al caricamento della pagina
-    updateBannerWithToday();
+    // Inizializza conversione live e dati astronomici al caricamento
     updateLiveConversion();
-
-    // Aggiorna i dati astronomici all'avvio e poi ogni minuto
     updateAstroData();
-    setInterval(updateAstroData, 60000);
-    // Aggiorna la conversione live ogni minuto
+
+    // Aggiorna conversione live e dati astronomici ogni minuto
     setInterval(() => {
-      updateBannerWithToday();
       updateLiveConversion();
+      updateAstroData();
     }, 60000);
   </script>
 </body>
