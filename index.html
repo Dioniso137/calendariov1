@@ -86,7 +86,7 @@
     #result, #searchResults, #liveConversion, #astroData, #sumResult, #astroEvents {
       margin-top: 10px;
     }
-    /* Centratura del cambio tema */
+    /* Ho centrato il controllo per il cambio del tema */
     .theme-toggle {
       text-align: center;
       margin-bottom: 10px;
@@ -172,30 +172,21 @@
     </div>
   </div>
 
-  <!-- Modal per il Glossario (se in futuro decidi di aggiungerlo) -->
-  <div id="glossaryModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="modalTitle">Titolo</h2>
-      <img id="modalImage" src="" alt="" style="width:100%; border-radius: 5px;">
-      <p id="modalDescription">Descrizione del simbolo e informazioni mitologiche...</p>
-    </div>
-  </div>
-
   <script>
-    // Gestione del tema (centrato)
+    // Tema chiaro/scuro centrato
     document.getElementById("themeSwitch").addEventListener("change", function() {
-      if (this.checked) {
+      if(this.checked) {
         document.body.classList.add("light-theme");
       } else {
         document.body.classList.remove("light-theme");
       }
     });
 
-    // --- Funzioni di Conversione e Astronomia ---
+    // Date base per la conversione
     const baseDate1965 = new Date(1965, 1, 21);
     const baseDate1913 = new Date(1913, 1, 21);
 
+    // Funzione per calcolare il giorno dell'anno (ignorando gli anni bisestili)
     function getNonLeapDayOfYear(date) {
       const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
       let dayOfYear = 0;
@@ -206,6 +197,7 @@
       return dayOfYear;
     }
 
+    // Array dei mesi civili
     const civilMonths = [
       { name: "Atlcahualo (o Cuauhitlehua)", days: 20 },
       { name: "Tlacaxipehualiztli", days: 20 },
@@ -227,6 +219,7 @@
       { name: "Izcalli", days: 20 }
     ];
 
+    // Array dei nomi sacri
     const sacredDayNames = [
       "Cipactli (Coccodrillo)",
       "Ehecatl (Vento)",
@@ -250,6 +243,7 @@
       "Xochitl (Fiore)"
     ];
 
+    // Funzione per ottenere il numero del mese civile (per visualizzazione)
     function getMonthNumber(civilMonthName) {
       for (let i = 0; i < civilMonths.length; i++) {
         if (civilMonths[i].name === civilMonthName) {
@@ -259,6 +253,7 @@
       return 0;
     }
 
+    // Funzione per calcolare la conversione e il Numero di Destino
     function computeConversion(inputDate) {
       const selectedDate = new Date(inputDate);
       selectedDate.setHours(12, 0, 0, 0);
@@ -271,6 +266,7 @@
       const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
       const diff = yearDiff * 365 + (selectedDOY - baseDOY);
 
+      // Calcolo del giorno civile
       const civilDay = diff % 365;
       let remainingDays = civilDay;
       let civilMonthName = "";
@@ -305,6 +301,7 @@
       };
     }
 
+    // Funzione per calcolare l'orario di inizio della fase lunare in fallback
     function computeMoonPhaseStart(now) {
       const synodicMonth = 29.53058867;
       const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
@@ -312,6 +309,7 @@
       const wholePeriod = Math.floor(elapsedDays / synodicMonth);
       const currentPhase = elapsedDays % synodicMonth;
       
+      // Definiamo i limiti (in giorni) per ciascuna fase lunare
       const lunarPhases = [
         { name: "Novilunio", start: 0, end: 1.84566 },
         { name: "Crescente", start: 1.84566, end: 5.53699 },
@@ -340,7 +338,7 @@
       return { moonPhaseName: computedPhaseName, phaseStartStr: phaseStartStr };
     }
 
-    // --- Event listeners ---
+    // Gestione della conversione per la data selezionata
     document.getElementById("convertButton").addEventListener("click", () => {
       const inputDate = document.getElementById("inputDate").value;
       const resultDiv = document.getElementById("result");
@@ -364,6 +362,7 @@
       }
     });
 
+    // Gestione dell'evento per sommare i risultati di due date
     document.getElementById("sumButton").addEventListener("click", () => {
       const firstDate = document.getElementById("firstDate").value;
       const secondDate = document.getElementById("secondDate").value;
@@ -389,44 +388,7 @@
          <p><strong>Numero di Destino:</strong> ${sumDestino}</p>`;
     });
 
-    // Gestione del filtro: quando si seleziona un criterio, viene creato l'input corrispondente
-    document.getElementById("filterCriterion").addEventListener("change", (e) => {
-      const criterion = e.target.value;
-      const filterInputArea = document.getElementById("filterInputArea");
-      if (!criterion) {
-        filterInputArea.innerHTML = "";
-        return;
-      }
-      if (criterion === "sacredSymbol") {
-        let selectHtml = `<select id="filterInput">
-                            <option value="">-- Seleziona Simbolo Sacro --</option>`;
-        sacredDayNames.forEach(symbol => {
-          selectHtml += `<option value="${symbol}">${symbol}</option>`;
-        });
-        selectHtml += `</select>`;
-        filterInputArea.innerHTML = selectHtml;
-      } else {
-        let placeholder = "";
-        switch (criterion) {
-          case "destiny":
-            placeholder = "Inserisci Numero Destino";
-            break;
-          case "civilDay":
-            placeholder = "Inserisci Giorno Civile";
-            break;
-          case "civilMonth":
-            placeholder = "Inserisci Mese Civile (numero)";
-            break;
-          case "sacredDay":
-            placeholder = "Inserisci Giorno Sacro";
-            break;
-          default:
-            break;
-        }
-        filterInputArea.innerHTML = `<input type="number" id="filterInput" placeholder="${placeholder}">`;
-      }
-    });
-
+    // Event listener per la ricerca con filtro
     document.getElementById("searchButton").addEventListener("click", () => {
       const criterion = document.getElementById("filterCriterion").value;
       const filterInputElement = document.getElementById("filterInput");
@@ -492,8 +454,7 @@
       return results;
     }
 
-    // --- Glossario Interattivo (se lo utilizzi in futuro) ---
-    // In questo esempio il glossario viene attivato cliccando sulle immagini, senza titolo sotto.
+    // Inizializzazione del Glossario Interattivo
     const symbolDetails = {
       "Cipactli (Coccodrillo)": "Simbolo del coccodrillo, rappresenta la forza primordiale e la creazione.",
       "Ehecatl (Vento)": "Simbolo del vento, associato a Ehecatl, il dio del vento e dell'aria.",
@@ -545,8 +506,6 @@
 
     // Event listener per il pulsante "Carica Eventi"
     document.getElementById("loadEventsButton").addEventListener("click", () => {
-      // Qui gli eventi sono statici.
-      // Per avere eventi live occorre integrare un'API esterna.
       const events = [
         { date: "2025-03-28", event: "Eclissi Solare Parziale" },
         { date: "2025-04-12", event: "Luna di Sangue" },
@@ -560,7 +519,7 @@
       document.getElementById("astroEvents").innerHTML = eventsHtml;
     });
 
-    // Inizializzazione al caricamento e aggiornamento ogni minuto
+    // Inizializzazione al caricamento
     updateLiveConversion();
     updateAstroData();
     setInterval(() => {
