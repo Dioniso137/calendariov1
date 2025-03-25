@@ -248,6 +248,50 @@
       };
     }
 
+    // Funzione che calcola il nome della fase lunare e l'orario di inizio della fase corrente
+    function getMoonPhaseData(now) {
+      const msPerDay = 86400000;
+      const synodicMonth = 29.53058867;
+      // Data di riferimento: Nuova Luna del 6 gennaio 2000 alle 18:14 UTC
+      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
+      const daysSinceKnown = (now.getTime() - knownNewMoon.getTime()) / msPerDay;
+      const cycleCount = Math.floor(daysSinceKnown / synodicMonth);
+      const lastNewMoon = new Date(knownNewMoon.getTime() + cycleCount * synodicMonth * msPerDay);
+      const phase = (now.getTime() - lastNewMoon.getTime()) / msPerDay;
+      let moonPhaseName = "";
+      let phaseStartOffset = 0;
+      if (phase < 1.84566) {
+        moonPhaseName = "Novilunio";
+        phaseStartOffset = 0;
+      } else if (phase < 5.53699) {
+        moonPhaseName = "Crescente";
+        phaseStartOffset = 1.84566;
+      } else if (phase < 9.22831) {
+        moonPhaseName = "Primo Quarto";
+        phaseStartOffset = 5.53699;
+      } else if (phase < 12.91963) {
+        moonPhaseName = "Gibbosa Crescente";
+        phaseStartOffset = 9.22831;
+      } else if (phase < 16.61096) {
+        moonPhaseName = "Piena";
+        phaseStartOffset = 12.91963;
+      } else if (phase < 20.30228) {
+        moonPhaseName = "Gibbosa Calante";
+        phaseStartOffset = 16.61096;
+      } else if (phase < 23.99361) {
+        moonPhaseName = "Ultimo Quarto";
+        phaseStartOffset = 20.30228;
+      } else if (phase < 27.68493) {
+        moonPhaseName = "Calante";
+        phaseStartOffset = 23.99361;
+      } else {
+        moonPhaseName = "Novilunio";
+        phaseStartOffset = 27.68493;
+      }
+      const phaseStart = new Date(lastNewMoon.getTime() + phaseStartOffset * msPerDay);
+      return { moonPhaseName, phaseStart };
+    }
+
     // Gestione della conversione per la data selezionata
     document.getElementById("convertButton").addEventListener("click", () => {
       const inputDate = document.getElementById("inputDate").value;
@@ -377,26 +421,6 @@
       }
     });
 
-    // Aggiornamento della conversione live
-    function updateLiveConversion() {
-      const today = new Date();
-      const result = computeConversion(today);
-      const liveDiv = document.getElementById("liveConversion");
-      if (result.error) {
-        liveDiv.textContent = result.error;
-      } else {
-        const civilMonthNumber = getMonthNumber(result.civil.month);
-        liveDiv.innerHTML = 
-          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
-           <p><strong>Mente:</strong> ${result.mindNumber}</p>
-           <p><strong>Anima:</strong> ${result.sacred.number}</p>
-           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-           <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
-           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-           <p><em>${result.cycle}</em></p>`;
-      }
-    }
-
     // Funzione per aggiornare i dati astronomici
     function updateAstroData() {
       const now = new Date();
@@ -422,26 +446,21 @@
         });
     }
 
-    // Funzione per aggiornare la fase lunare usando un'API esterna con fallback
+    // Funzione per aggiornare la fase lunare usando l'API (ma sovrascrivendo l'orario con il calcolo della fase di inizio)
     function updateMoonPhase(sunrise, sunset, now) {
+      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
       const days = Math.floor(now.getTime() / 86400000);
       const moonApiUrl = "https://api.farmsense.net/v1/moonphases/?d=" + days;
-      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
       fetch(moonApiUrl)
         .then(response => response.json())
         .then(moonData => {
           if (moonData && moonData.length > 0) {
-            const phaseInfo = moonData[0];
-            const moonPhaseName = phaseInfo.Phase;
-            let phaseStart;
-            if (phaseInfo.Date) {
-              phaseStart = new Date(phaseInfo.Date).toLocaleTimeString('it-IT', options);
-            } else {
-              phaseStart = now.toLocaleTimeString('it-IT', options);
-            }
-            const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+            // Calcola la data di inizio della fase lunare usando la funzione apposita
+            const phaseData = getMoonPhaseData(now);
+            const formattedPhaseStart = phaseData.phaseStart.toLocaleTimeString('it-IT', options);
+            const currentTime = now.toLocaleTimeString('it-IT', options);
             document.getElementById("astroData").innerHTML = 
-              `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+              `<p><strong>Luna:</strong> Fase: ${moonData[0].Phase} (inizio: ${formattedPhaseStart})</p>
                <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
                <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
           } else {
@@ -454,36 +473,14 @@
         });
     }
 
-    // Fallback per la fase lunare (calcolo approssimativo)
+    // Fallback per la fase lunare (calcolo approssimativo usando la stessa funzione)
     function fallbackMoonPhase(sunrise, sunset, now) {
-      const synodicMonth = 29.53058867;
-      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
-      let phase = ((now.getTime() - knownNewMoon.getTime()) / 86400000) % synodicMonth;
-      if (phase < 0) phase += synodicMonth;
-      let moonPhaseName = "";
-      if (phase < 1.84566) {
-        moonPhaseName = "Novilunio";
-      } else if (phase < 5.53699) {
-        moonPhaseName = "Crescente";
-      } else if (phase < 9.22831) {
-        moonPhaseName = "Primo Quarto";
-      } else if (phase < 12.91963) {
-        moonPhaseName = "Gibbosa Crescente";
-      } else if (phase < 16.61096) {
-        moonPhaseName = "Piena";
-      } else if (phase < 20.30228) {
-        moonPhaseName = "Gibbosa Calante";
-      } else if (phase < 23.99361) {
-        moonPhaseName = "Ultimo Quarto";
-      } else if (phase < 27.68493) {
-        moonPhaseName = "Calante";
-      } else {
-        moonPhaseName = "Novilunio";
-      }
-      const phaseStart = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
-      const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
+      const phaseData = getMoonPhaseData(now);
+      const formattedPhaseStart = phaseData.phaseStart.toLocaleTimeString('it-IT', options);
+      const currentTime = now.toLocaleTimeString('it-IT', options);
       document.getElementById("astroData").innerHTML = 
-        `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+        `<p><strong>Luna:</strong> Fase: ${phaseData.moonPhaseName} (inizio: ${formattedPhaseStart})</p>
          <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
          <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
     }
@@ -497,6 +494,26 @@
       updateLiveConversion();
       updateAstroData();
     }, 60000);
+
+    // Aggiornamento della conversione live
+    function updateLiveConversion() {
+      const today = new Date();
+      const result = computeConversion(today);
+      const liveDiv = document.getElementById("liveConversion");
+      if (result.error) {
+        liveDiv.textContent = result.error;
+      } else {
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        liveDiv.innerHTML = 
+          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
+           <p><strong>Mente:</strong> ${result.mindNumber}</p>
+           <p><strong>Anima:</strong> ${result.sacred.number}</p>
+           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+           <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+           <p><em>${result.cycle}</em></p>`;
+      }
+    }
   </script>
 </body>
 </html>
