@@ -248,48 +248,43 @@
       };
     }
 
-    // Funzione che calcola il nome della fase lunare e l'orario di inizio della fase corrente
-    function getMoonPhaseData(now) {
-      const msPerDay = 86400000;
+    // Funzione per calcolare l'orario di inizio della fase lunare in fallback
+    function computeMoonPhaseStart(now) {
       const synodicMonth = 29.53058867;
-      // Data di riferimento: Nuova Luna del 6 gennaio 2000 alle 18:14 UTC
+      // Data di riferimento per il nuovo di luna (in UTC)
       const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
-      const daysSinceKnown = (now.getTime() - knownNewMoon.getTime()) / msPerDay;
-      const cycleCount = Math.floor(daysSinceKnown / synodicMonth);
-      const lastNewMoon = new Date(knownNewMoon.getTime() + cycleCount * synodicMonth * msPerDay);
-      const phase = (now.getTime() - lastNewMoon.getTime()) / msPerDay;
-      let moonPhaseName = "";
-      let phaseStartOffset = 0;
-      if (phase < 1.84566) {
-        moonPhaseName = "Novilunio";
-        phaseStartOffset = 0;
-      } else if (phase < 5.53699) {
-        moonPhaseName = "Crescente";
-        phaseStartOffset = 1.84566;
-      } else if (phase < 9.22831) {
-        moonPhaseName = "Primo Quarto";
-        phaseStartOffset = 5.53699;
-      } else if (phase < 12.91963) {
-        moonPhaseName = "Gibbosa Crescente";
-        phaseStartOffset = 9.22831;
-      } else if (phase < 16.61096) {
-        moonPhaseName = "Piena";
-        phaseStartOffset = 12.91963;
-      } else if (phase < 20.30228) {
-        moonPhaseName = "Gibbosa Calante";
-        phaseStartOffset = 16.61096;
-      } else if (phase < 23.99361) {
-        moonPhaseName = "Ultimo Quarto";
-        phaseStartOffset = 20.30228;
-      } else if (phase < 27.68493) {
-        moonPhaseName = "Calante";
-        phaseStartOffset = 23.99361;
-      } else {
-        moonPhaseName = "Novilunio";
-        phaseStartOffset = 27.68493;
+      const elapsedDays = (now.getTime() - knownNewMoon.getTime()) / 86400000;
+      const wholePeriod = Math.floor(elapsedDays / synodicMonth);
+      const currentPhase = elapsedDays % synodicMonth;
+      
+      // Definiamo i limiti (in giorni) per ciascuna fase lunare
+      const lunarPhases = [
+        { name: "Novilunio", start: 0, end: 1.84566 },
+        { name: "Crescente", start: 1.84566, end: 5.53699 },
+        { name: "Primo Quarto", start: 5.53699, end: 9.22831 },
+        { name: "Gibbosa Crescente", start: 9.22831, end: 12.91963 },
+        { name: "Piena", start: 12.91963, end: 16.61096 },
+        { name: "Gibbosa Calante", start: 16.61096, end: 20.30228 },
+        { name: "Ultimo Quarto", start: 20.30228, end: 23.99361 },
+        { name: "Calante", start: 23.99361, end: 27.68493 },
+        { name: "Novilunio", start: 27.68493, end: synodicMonth }
+      ];
+      
+      let phaseStartThreshold = 0;
+      let computedPhaseName = "";
+      for (let i = 0; i < lunarPhases.length; i++) {
+        if (currentPhase >= lunarPhases[i].start && currentPhase < lunarPhases[i].end) {
+          phaseStartThreshold = lunarPhases[i].start;
+          computedPhaseName = lunarPhases[i].name;
+          break;
+        }
       }
-      const phaseStart = new Date(lastNewMoon.getTime() + phaseStartOffset * msPerDay);
-      return { moonPhaseName, phaseStart };
+      // Calcola l'orario assoluto d'inizio della fase corrente
+      const phaseStartAbsoluteMs = knownNewMoon.getTime() + (wholePeriod * synodicMonth + phaseStartThreshold) * 86400000;
+      const phaseStartDate = new Date(phaseStartAbsoluteMs);
+      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
+      const phaseStartStr = phaseStartDate.toLocaleTimeString('it-IT', options);
+      return { moonPhaseName: computedPhaseName, phaseStartStr: phaseStartStr };
     }
 
     // Gestione della conversione per la data selezionata
@@ -421,6 +416,26 @@
       }
     });
 
+    // Aggiornamento della conversione live
+    function updateLiveConversion() {
+      const today = new Date();
+      const result = computeConversion(today);
+      const liveDiv = document.getElementById("liveConversion");
+      if (result.error) {
+        liveDiv.textContent = result.error;
+      } else {
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        liveDiv.innerHTML = 
+          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
+           <p><strong>Mente:</strong> ${result.mindNumber}</p>
+           <p><strong>Anima:</strong> ${result.sacred.number}</p>
+           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+           <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+           <p><em>${result.cycle}</em></p>`;
+      }
+    }
+
     // Funzione per aggiornare i dati astronomici
     function updateAstroData() {
       const now = new Date();
@@ -446,21 +461,29 @@
         });
     }
 
-    // Funzione per aggiornare la fase lunare usando l'API (ma sovrascrivendo l'orario con il calcolo della fase di inizio)
+    // Funzione per aggiornare la fase lunare usando un'API esterna con fallback
     function updateMoonPhase(sunrise, sunset, now) {
       const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
-      const days = Math.floor(now.getTime() / 86400000);
-      const moonApiUrl = "https://api.farmsense.net/v1/moonphases/?d=" + days;
+      const moonApiUrl = "https://api.farmsense.net/v1/moonphases/?d=" + Math.floor(now.getTime() / 86400000);
       fetch(moonApiUrl)
         .then(response => response.json())
         .then(moonData => {
           if (moonData && moonData.length > 0) {
-            // Calcola la data di inizio della fase lunare usando la funzione apposita
-            const phaseData = getMoonPhaseData(now);
-            const formattedPhaseStart = phaseData.phaseStart.toLocaleTimeString('it-IT', options);
-            const currentTime = now.toLocaleTimeString('it-IT', options);
+            const phaseInfo = moonData[0];
+            let moonPhaseName = phaseInfo.Phase;
+            let phaseStartStr;
+            if (phaseInfo.Date) {
+              // Se la API fornisce una data, la usiamo
+              phaseStartStr = new Date(phaseInfo.Date).toLocaleTimeString('it-IT', options);
+            } else {
+              // Altrimenti usiamo il calcolo di fallback
+              const computed = computeMoonPhaseStart(now);
+              moonPhaseName = computed.moonPhaseName;
+              phaseStartStr = computed.phaseStartStr;
+            }
+            const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
             document.getElementById("astroData").innerHTML = 
-              `<p><strong>Luna:</strong> Fase: ${moonData[0].Phase} (inizio: ${formattedPhaseStart})</p>
+              `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
                <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
                <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
           } else {
@@ -473,14 +496,14 @@
         });
     }
 
-    // Fallback per la fase lunare (calcolo approssimativo usando la stessa funzione)
+    // Fallback per la fase lunare (calcolo dell'orario di inizio della fase)
     function fallbackMoonPhase(sunrise, sunset, now) {
-      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
-      const phaseData = getMoonPhaseData(now);
-      const formattedPhaseStart = phaseData.phaseStart.toLocaleTimeString('it-IT', options);
-      const currentTime = now.toLocaleTimeString('it-IT', options);
+      const computed = computeMoonPhaseStart(now);
+      const moonPhaseName = computed.moonPhaseName;
+      const phaseStartStr = computed.phaseStartStr;
+      const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       document.getElementById("astroData").innerHTML = 
-        `<p><strong>Luna:</strong> Fase: ${phaseData.moonPhaseName} (inizio: ${formattedPhaseStart})</p>
+        `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
          <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
          <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
     }
@@ -494,26 +517,6 @@
       updateLiveConversion();
       updateAstroData();
     }, 60000);
-
-    // Aggiornamento della conversione live
-    function updateLiveConversion() {
-      const today = new Date();
-      const result = computeConversion(today);
-      const liveDiv = document.getElementById("liveConversion");
-      if (result.error) {
-        liveDiv.textContent = result.error;
-      } else {
-        const civilMonthNumber = getMonthNumber(result.civil.month);
-        liveDiv.innerHTML = 
-          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
-           <p><strong>Mente:</strong> ${result.mindNumber}</p>
-           <p><strong>Anima:</strong> ${result.sacred.number}</p>
-           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-           <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
-           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-           <p><em>${result.cycle}</em></p>`;
-      }
-    }
   </script>
 </body>
 </html>
