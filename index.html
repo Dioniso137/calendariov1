@@ -172,17 +172,27 @@
     </div>
   </div>
 
+  <!-- Modal per il Glossario (se in futuro decidi di aggiungerlo) -->
+  <div id="glossaryModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle">Titolo</h2>
+      <img id="modalImage" src="" alt="" style="width:100%; border-radius: 5px;">
+      <p id="modalDescription">Descrizione del simbolo e informazioni mitologiche...</p>
+    </div>
+  </div>
+
   <script>
-    // Centratura del cambio tema
+    // Gestione del tema (centrato)
     document.getElementById("themeSwitch").addEventListener("change", function() {
-      if(this.checked) {
+      if (this.checked) {
         document.body.classList.add("light-theme");
       } else {
         document.body.classList.remove("light-theme");
       }
     });
 
-    // Date base per la conversione
+    // --- Funzioni di Conversione e Astronomia ---
     const baseDate1965 = new Date(1965, 1, 21);
     const baseDate1913 = new Date(1913, 1, 21);
 
@@ -330,6 +340,7 @@
       return { moonPhaseName: computedPhaseName, phaseStartStr: phaseStartStr };
     }
 
+    // --- Event listeners ---
     document.getElementById("convertButton").addEventListener("click", () => {
       const inputDate = document.getElementById("inputDate").value;
       const resultDiv = document.getElementById("result");
@@ -376,6 +387,44 @@
          <p><strong>Mente:</strong> ${sumMente}</p>
          <p><strong>Anima:</strong> ${sumAnima}</p>
          <p><strong>Numero di Destino:</strong> ${sumDestino}</p>`;
+    });
+
+    // Gestione del filtro: quando si seleziona un criterio, viene creato l'input corrispondente
+    document.getElementById("filterCriterion").addEventListener("change", (e) => {
+      const criterion = e.target.value;
+      const filterInputArea = document.getElementById("filterInputArea");
+      if (!criterion) {
+        filterInputArea.innerHTML = "";
+        return;
+      }
+      if (criterion === "sacredSymbol") {
+        let selectHtml = `<select id="filterInput">
+                            <option value="">-- Seleziona Simbolo Sacro --</option>`;
+        sacredDayNames.forEach(symbol => {
+          selectHtml += `<option value="${symbol}">${symbol}</option>`;
+        });
+        selectHtml += `</select>`;
+        filterInputArea.innerHTML = selectHtml;
+      } else {
+        let placeholder = "";
+        switch (criterion) {
+          case "destiny":
+            placeholder = "Inserisci Numero Destino";
+            break;
+          case "civilDay":
+            placeholder = "Inserisci Giorno Civile";
+            break;
+          case "civilMonth":
+            placeholder = "Inserisci Mese Civile (numero)";
+            break;
+          case "sacredDay":
+            placeholder = "Inserisci Giorno Sacro";
+            break;
+          default:
+            break;
+        }
+        filterInputArea.innerHTML = `<input type="number" id="filterInput" placeholder="${placeholder}">`;
+      }
     });
 
     document.getElementById("searchButton").addEventListener("click", () => {
@@ -443,7 +492,8 @@
       return results;
     }
 
-    // Glossario Interattivo
+    // --- Glossario Interattivo (se lo utilizzi in futuro) ---
+    // In questo esempio il glossario viene attivato cliccando sulle immagini, senza titolo sotto.
     const symbolDetails = {
       "Cipactli (Coccodrillo)": "Simbolo del coccodrillo, rappresenta la forza primordiale e la creazione.",
       "Ehecatl (Vento)": "Simbolo del vento, associato a Ehecatl, il dio del vento e dell'aria.",
@@ -495,8 +545,8 @@
 
     // Event listener per il pulsante "Carica Eventi"
     document.getElementById("loadEventsButton").addEventListener("click", () => {
-      // Attualmente gli eventi sono statici.
-      // Per ottenere eventi aggiornati in live, occorre integrare un'API esterna che fornisca queste informazioni.
+      // Qui gli eventi sono statici.
+      // Per avere eventi live occorre integrare un'API esterna.
       const events = [
         { date: "2025-03-28", event: "Eclissi Solare Parziale" },
         { date: "2025-04-12", event: "Luna di Sangue" },
@@ -510,7 +560,7 @@
       document.getElementById("astroEvents").innerHTML = eventsHtml;
     });
 
-    // Inizializzazione al caricamento
+    // Inizializzazione al caricamento e aggiornamento ogni minuto
     updateLiveConversion();
     updateAstroData();
     setInterval(() => {
