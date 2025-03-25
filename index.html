@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Convertitore Calendario, Ricerca e Dati Astronomici Live - Dark</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Reset base */
     *, *::before, *::after {
@@ -84,7 +83,7 @@
     button:hover {
       background: #444;
     }
-    #result, #searchResults, #liveConversion, #astroData, #sumResult, #dashboardChart, #astroEvents {
+    #result, #searchResults, #liveConversion, #astroData, #sumResult, #astroEvents {
       margin-top: 10px;
     }
     .theme-toggle {
@@ -162,18 +161,6 @@
     <div class="section" id="astroSection">
       <h2>Dati Astronomici Live</h2>
       <div id="astroData">Caricamento dati astronomici...</div>
-    </div>
-
-    <!-- Nuova Sezione: Dashboard Interattiva -->
-    <div class="section" id="dashboardSection">
-      <h2>Dashboard Interattiva</h2>
-      <p>Seleziona intervallo di date per il grafico:</p>
-      <p>Data Iniziale:</p>
-      <input type="date" id="dashboardStartDate">
-      <p>Data Finale:</p>
-      <input type="date" id="dashboardEndDate">
-      <button id="generateChartButton">Genera Grafico</button>
-      <canvas id="dashboardChart" width="400" height="200"></canvas>
     </div>
 
     <!-- Nuova Sezione: Eventi Astronomici -->
@@ -598,92 +585,6 @@
          <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
          <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
     }
-
-    // Dashboard: Generazione grafico per intervallo date
-    document.getElementById("generateChartButton").addEventListener("click", () => {
-      const startDateVal = document.getElementById("dashboardStartDate").value;
-      const endDateVal = document.getElementById("dashboardEndDate").value;
-      if (!startDateVal || !endDateVal) {
-        alert("Per favore, inserisci entrambe le date per il grafico.");
-        return;
-      }
-      const startDate = new Date(startDateVal);
-      const endDate = new Date(endDateVal);
-      let labels = [];
-      let spiritoData = [];
-      let menteData = [];
-      let animaData = [];
-      let destinoData = [];
-
-      for(let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0];
-        labels.push(dateStr);
-        const conv = computeConversion(dateStr);
-        spiritoData.push(conv.civil.day);
-        menteData.push(conv.mindNumber);
-        animaData.push(conv.sacred.number);
-        destinoData.push(conv.destiny);
-      }
-
-      // Creazione del grafico usando Chart.js
-      const ctx = document.getElementById('dashboardChart').getContext('2d');
-      // Se esiste già un grafico, distruggerlo
-      if(window.dashboardChartInstance) {
-        window.dashboardChartInstance.destroy();
-      }
-      window.dashboardChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Spirito',
-              data: spiritoData,
-              fill: false,
-              tension: 0.1
-            },
-            {
-              label: 'Mente',
-              data: menteData,
-              fill: false,
-              tension: 0.1
-            },
-            {
-              label: 'Anima',
-              data: animaData,
-              fill: false,
-              tension: 0.1
-            },
-            {
-              label: 'Numero di Destino',
-              data: destinoData,
-              fill: false,
-              tension: 0.1
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              display: true,
-              title: {
-                display: true,
-                text: 'Data'
-              }
-            },
-            y: {
-              display: true,
-              title: {
-                display: true,
-                text: 'Valori'
-              }
-            }
-          }
-        }
-      });
-    });
 
     // Astronomical Events (placeholder con eventi statici)
     document.getElementById("loadEventsButton").addEventListener("click", () => {
