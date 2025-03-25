@@ -44,6 +44,7 @@
     input[type="date"],
     input[type="number"],
     input[type="text"],
+    select,
     button {
       width: 100%;
       padding: 12px 15px;
@@ -65,7 +66,7 @@
     button:hover {
       background: #444;
     }
-    #result, #searchResults {
+    #result, #searchResults, #liveConversion, #astroData {
       margin-top: 10px;
     }
     @media (max-width: 600px) {
@@ -75,7 +76,7 @@
       .container {
         padding: 10px;
       }
-      input, button {
+      input, select, button {
         padding: 10px;
         font-size: 0.9rem;
       }
@@ -102,14 +103,16 @@
     <!-- Sezione Cerca Date per Numero di Destino e Filtri -->
     <div class="section" id="destinySearchSection">
       <h2>Cerca Date per Numero di Destino e Filtri</h2>
-      <p>Inserisci il Numero di Destino (opzionale):</p>
-      <input type="number" id="destinyInput" placeholder="Numero di Destino (3 - 53)" min="3" max="53">
-      <p>Inserisci il Numero del Giorno Civile (opzionale):</p>
-      <input type="number" id="civilInput" placeholder="Giorno Civile">
-      <p>Inserisci il Numero del Giorno Sacro (opzionale):</p>
-      <input type="number" id="sacredDayInput" placeholder="Giorno Sacro">
-      <p>Inserisci il Simbolo Sacro (opzionale):</p>
-      <input type="text" id="sacredSymbolInput" placeholder="Simbolo Sacro">
+      <p>Scegli criterio filtro:</p>
+      <select id="filterCriterion">
+         <option value="">-- Seleziona criterio --</option>
+         <option value="destiny">Numero Destino</option>
+         <option value="civilDay">Giorno Civile</option>
+         <option value="civilMonth">Mese Civile</option>
+         <option value="sacredDay">Giorno Sacro</option>
+         <option value="sacredSymbol">Simbolo Sacro</option>
+      </select>
+      <div id="filterInputArea"></div>
       <p>Data Iniziale:</p>
       <input type="date" id="startDate">
       <p>Data Finale:</p>
@@ -259,19 +262,18 @@
       } else {
         const civilMonthNumber = getMonthNumber(result.civil.month);
         resultDiv.innerHTML = 
-          <p><strong>Spirito:</strong> ${result.civil.day}</p>
-          <p><strong>Mente:</strong> ${result.mindNumber}</p>
-          <p><strong>Anima:</strong> ${result.sacred.number}</p>
-          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
-          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-          <p><em>${result.cycle}</em></p>
-        ;
+          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
+           <p><strong>Mente:</strong> ${result.mindNumber}</p>
+           <p><strong>Anima:</strong> ${result.sacred.number}</p>
+           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+           <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+           <p><em>${result.cycle}</em></p>`;
       }
     });
 
-    // Funzione per cercare date in un intervallo con filtri multipli
-    function searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDateStr, endDateStr) {
+    // Funzione per cercare date in un intervallo in base a un solo criterio
+    function searchDatesByFilter(criterion, target, startDateStr, endDateStr) {
       const results = [];
       let currentDate = new Date(startDateStr);
       const endDate = new Date(endDateStr);
@@ -284,17 +286,26 @@
           continue;
         }
         let match = true;
-        if (destinyTarget !== null && destinyTarget !== "") {
-          if (conv.destiny !== destinyTarget) match = false;
-        }
-        if (civilTarget !== null && civilTarget !== "") {
-          if (conv.civil.day !== civilTarget) match = false;
-        }
-        if (sacredDayTarget !== null && sacredDayTarget !== "") {
-          if (conv.sacred.number !== sacredDayTarget) match = false;
-        }
-        if (sacredSymbolTarget !== null && sacredSymbolTarget !== "") {
-          if (conv.sacred.name.toLowerCase() !== sacredSymbolTarget.toLowerCase()) match = false;
+        if (criterion && target !== "") {
+          switch (criterion) {
+            case "destiny":
+              if (conv.destiny !== parseInt(target)) match = false;
+              break;
+            case "civilDay":
+              if (conv.civil.day !== parseInt(target)) match = false;
+              break;
+            case "civilMonth":
+              if (getMonthNumber(conv.civil.month) !== parseInt(target)) match = false;
+              break;
+            case "sacredDay":
+              if (conv.sacred.number !== parseInt(target)) match = false;
+              break;
+            case "sacredSymbol":
+              if (conv.sacred.name.toLowerCase() !== target.toLowerCase()) match = false;
+              break;
+            default:
+              break;
+          }
         }
         if (match) {
           results.push(currentDate.toISOString().split('T')[0]);
@@ -304,12 +315,49 @@
       return results;
     }
 
-    // Gestione dell'evento per la ricerca con filtri multipli
+    // Gestione dell'evento per la selezione del criterio filtro
+    document.getElementById("filterCriterion").addEventListener("change", (e) => {
+      const criterion = e.target.value;
+      const filterInputArea = document.getElementById("filterInputArea");
+      if (!criterion) {
+        filterInputArea.innerHTML = "";
+        return;
+      }
+      if (criterion === "sacredSymbol") {
+        let selectHtml = `<select id="filterInput">
+                            <option value="">-- Seleziona Simbolo Sacro --</option>`;
+        sacredDayNames.forEach(symbol => {
+          selectHtml += `<option value="${symbol}">${symbol}</option>`;
+        });
+        selectHtml += `</select>`;
+        filterInputArea.innerHTML = selectHtml;
+      } else {
+        let placeholder = "";
+        switch (criterion) {
+          case "destiny":
+            placeholder = "Inserisci Numero Destino";
+            break;
+          case "civilDay":
+            placeholder = "Inserisci Giorno Civile";
+            break;
+          case "civilMonth":
+            placeholder = "Inserisci Mese Civile (numero)";
+            break;
+          case "sacredDay":
+            placeholder = "Inserisci Giorno Sacro";
+            break;
+          default:
+            break;
+        }
+        filterInputArea.innerHTML = `<input type="number" id="filterInput" placeholder="${placeholder}">`;
+      }
+    });
+
+    // Gestione dell'evento per la ricerca con filtro
     document.getElementById("searchButton").addEventListener("click", () => {
-      const destinyValue = document.getElementById("destinyInput").value;
-      const civilValue = document.getElementById("civilInput").value;
-      const sacredDayValue = document.getElementById("sacredDayInput").value;
-      const sacredSymbolValue = document.getElementById("sacredSymbolInput").value;
+      const criterion = document.getElementById("filterCriterion").value;
+      const filterInputElement = document.getElementById("filterInput");
+      const filterValue = filterInputElement ? filterInputElement.value : "";
       const startDate = document.getElementById("startDate").value;
       const endDate = document.getElementById("endDate").value;
       const searchResultsDiv = document.getElementById("searchResults");
@@ -319,17 +367,12 @@
         return;
       }
       
-      const destinyTarget = destinyValue ? parseInt(destinyValue) : "";
-      const civilTarget = civilValue ? parseInt(civilValue) : "";
-      const sacredDayTarget = sacredDayValue ? parseInt(sacredDayValue) : "";
-      const sacredSymbolTarget = sacredSymbolValue ? sacredSymbolValue.trim() : "";
-      
-      const datesFound = searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDate, endDate);
+      const datesFound = searchDatesByFilter(criterion, filterValue, startDate, endDate);
       if (datesFound.length === 0) {
         searchResultsDiv.innerHTML = "<p>Nessuna data trovata con i criteri inseriti.</p>";
       } else {
         searchResultsDiv.innerHTML = "<p>Date trovate:</p><ul>" +
-          datesFound.map(date => <li>${date}</li>).join('') +
+          datesFound.map(date => `<li>${date}</li>`).join('') +
           "</ul>";
       }
     });
@@ -344,14 +387,13 @@
       } else {
         const civilMonthNumber = getMonthNumber(result.civil.month);
         liveDiv.innerHTML = 
-          <p><strong>Spirito:</strong> ${result.civil.day}</p>
-          <p><strong>Mente:</strong> ${result.mindNumber}</p>
-          <p><strong>Anima:</strong> ${result.sacred.number}</p>
-          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
-          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
-          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-          <p><em>${result.cycle}</em></p>
-        ;
+          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
+           <p><strong>Mente:</strong> ${result.mindNumber}</p>
+           <p><strong>Anima:</strong> ${result.sacred.number}</p>
+           <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+           <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+           <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+           <p><em>${result.cycle}</em></p>`;
       }
     }
 
@@ -399,10 +441,9 @@
             }
             const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
             document.getElementById("astroData").innerHTML = 
-              <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
-              <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
-              <p><strong>Ora attuale:</strong> ${currentTime}</p>
-            ;
+              `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+               <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+               <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
           } else {
             fallbackMoonPhase(sunrise, sunset, now);
           }
@@ -442,10 +483,9 @@
       const phaseStart = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       document.getElementById("astroData").innerHTML = 
-        <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
-        <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
-        <p><strong>Ora attuale:</strong> ${currentTime}</p>
-      ;
+        `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+         <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+         <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
     }
 
     // Inizializza conversione live e dati astronomici al caricamento
