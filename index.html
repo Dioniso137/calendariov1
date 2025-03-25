@@ -1,139 +1,462 @@
-<!-- Sezione Cerca Date per Numero di Destino e Filtri -->
-<div class="section" id="destinySearchSection">
-  <h2>Cerca Date per Numero di Destino e Filtri</h2>
-  
-  <p>Numero di Destino (opzionale):</p>
-  <select id="destinySelect">
-    <option value="">Non specificato</option>
-    <!-- Opzioni da 3 a 53 -->
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-    <option value="16">16</option>
-    <option value="17">17</option>
-    <option value="18">18</option>
-    <option value="19">19</option>
-    <option value="20">20</option>
-    <option value="21">21</option>
-    <option value="22">22</option>
-    <option value="23">23</option>
-    <option value="24">24</option>
-    <option value="25">25</option>
-    <option value="26">26</option>
-    <option value="27">27</option>
-    <option value="28">28</option>
-    <option value="29">29</option>
-    <option value="30">30</option>
-    <option value="31">31</option>
-    <option value="32">32</option>
-    <option value="33">33</option>
-    <option value="34">34</option>
-    <option value="35">35</option>
-    <option value="36">36</option>
-    <option value="37">37</option>
-    <option value="38">38</option>
-    <option value="39">39</option>
-    <option value="40">40</option>
-    <option value="41">41</option>
-    <option value="42">42</option>
-    <option value="43">43</option>
-    <option value="44">44</option>
-    <option value="45">45</option>
-    <option value="46">46</option>
-    <option value="47">47</option>
-    <option value="48">48</option>
-    <option value="49">49</option>
-    <option value="50">50</option>
-    <option value="51">51</option>
-    <option value="52">52</option>
-    <option value="53">53</option>
-  </select>
-  
-  <p>Giorno Civile (opzionale):</p>
-  <select id="civilSelect">
-    <option value="">Non specificato</option>
-    <!-- Opzioni da 1 a 20 -->
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-    <option value="16">16</option>
-    <option value="17">17</option>
-    <option value="18">18</option>
-    <option value="19">19</option>
-    <option value="20">20</option>
-  </select>
-  
-  <p>Giorno Sacro (opzionale):</p>
-  <select id="sacredDaySelect">
-    <option value="">Non specificato</option>
-    <!-- Opzioni da 1 a 13 -->
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-  </select>
-  
-  <p>Simbolo Sacro (opzionale):</p>
-  <select id="sacredSymbolSelect">
-    <option value="">Non specificato</option>
-    <option value="Cipactli (Coccodrillo)">Cipactli (Coccodrillo)</option>
-    <option value="Ehecatl (Vento)">Ehecatl (Vento)</option>
-    <option value="Calli (Casa)">Calli (Casa)</option>
-    <option value="Cuetzpalin (Lucertola)">Cuetzpalin (Lucertola)</option>
-    <option value="Coatl (Serpente)">Coatl (Serpente)</option>
-    <option value="Miquiztli (Morte)">Miquiztli (Morte)</option>
-    <option value="Mazatl (Cervo)">Mazatl (Cervo)</option>
-    <option value="Tochtli (Coniglio)">Tochtli (Coniglio)</option>
-    <option value="Atl (Acqua)">Atl (Acqua)</option>
-    <option value="Itzcuintli (Cane)">Itzcuintli (Cane)</option>
-    <option value="Ozomahtli (Scimmia)">Ozomahtli (Scimmia)</option>
-    <option value="Malinalli (Erba)">Malinalli (Erba)</option>
-    <option value="Acatl (Canna)">Acatl (Canna)</option>
-    <option value="Ocelotl (Giaguaro)">Ocelotl (Giaguaro)</option>
-    <option value="Cuauhtli (Aquila)">Cuauhtli (Aquila)</option>
-    <option value="Cozcacuauhtli (Avvoltoio)">Cozcacuauhtli (Avvoltoio)</option>
-    <option value="Ollin (Movimento)">Ollin (Movimento)</option>
-    <option value="Tecpatl (Coltello di selce)">Tecpatl (Coltello di selce)</option>
-    <option value="Quiahuitl (Pioggia)">Quiahuitl (Pioggia)</option>
-    <option value="Xochitl (Fiore)">Xochitl (Fiore)</option>
-  </select>
-  
-  <p>Data Iniziale:</p>
-  <input type="date" id="startDate">
-  <p>Data Finale:</p>
-  <input type="date" id="endDate">
-  
-  <button id="searchButton">Cerca Date</button>
-  <div id="searchResults"></div>
-</div>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convertitore Calendario, Ricerca e Dati Astronomici Live - Dark</title>
+  <style>
+    /* Reset base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 20px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+    .section {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.8);
+    }
+    h1, h2 {
+      margin-bottom: 15px;
+    }
+    p {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    input[type="date"],
+    input[type="number"],
+    input[type="text"],
+    button {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      border: 1px solid #555;
+      border-radius: 5px;
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+      text-align: center;
+    }
+    button {
+      background: #333;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #444;
+    }
+    #result, #searchResults {
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 10px;
+      }
+      input, button {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sezione Conversione Live del Giorno -->
+    <div class="section" id="liveConversionSection">
+      <h2>Conversione Live del Giorno</h2>
+      <div id="liveConversion">Caricamento conversione live...</div>
+    </div>
+
+    <!-- Sezione Convertitore Calendario -->
+    <div class="section" id="converterSection">
+      <h1>Convertitore Calendario</h1>
+      <p>Inserisci una data del calendario gregoriano:</p>
+      <input type="date" id="inputDate">
+      <button id="convertButton">Converti</button>
+      <div id="result"></div>
+    </div>
+
+    <!-- Sezione Cerca Date per Numero di Destino e Filtri -->
+    <div class="section" id="destinySearchSection">
+      <h2>Cerca Date per Numero di Destino e Filtri</h2>
+      <p>Inserisci il Numero di Destino (opzionale):</p>
+      <input type="number" id="destinyInput" placeholder="Numero di Destino (3 - 53)" min="3" max="53">
+      <p>Inserisci il Numero del Giorno Civile (opzionale):</p>
+      <input type="number" id="civilInput" placeholder="Giorno Civile">
+      <p>Inserisci il Numero del Giorno Sacro (opzionale):</p>
+      <input type="number" id="sacredDayInput" placeholder="Giorno Sacro">
+      <p>Inserisci il Simbolo Sacro (opzionale):</p>
+      <input type="text" id="sacredSymbolInput" placeholder="Simbolo Sacro">
+      <p>Data Iniziale:</p>
+      <input type="date" id="startDate">
+      <p>Data Finale:</p>
+      <input type="date" id="endDate">
+      <button id="searchButton">Cerca Date</button>
+      <div id="searchResults"></div>
+    </div>
+
+    <!-- Sezione Dati Astronomici Live -->
+    <div class="section" id="astroSection">
+      <h2>Dati Astronomici Live</h2>
+      <div id="astroData">Caricamento dati astronomici...</div>
+    </div>
+  </div>
+
+  <script>
+    // Date base per la conversione
+    const baseDate1965 = new Date(1965, 1, 21);
+    const baseDate1913 = new Date(1913, 1, 21);
+
+    // Funzione per calcolare il giorno dell'anno (ignorando gli anni bisestili)
+    function getNonLeapDayOfYear(date) {
+      const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      let dayOfYear = 0;
+      for (let i = 0; i < date.getMonth(); i++) {
+        dayOfYear += monthLengths[i];
+      }
+      dayOfYear += date.getDate();
+      return dayOfYear;
+    }
+
+    // Array dei mesi civili
+    const civilMonths = [
+      { name: "Atlcahualo (o Cuauhitlehua)", days: 20 },
+      { name: "Tlacaxipehualiztli", days: 20 },
+      { name: "Tozoztontli", days: 20 },
+      { name: "Huey Tozoztontli", days: 20 },
+      { name: "Toxcatl", days: 20 },
+      { name: "Etzalcualiztli", days: 20 },
+      { name: "Tecuilhuitontli", days: 20 },
+      { name: "Huey Tecuhuitl", days: 20 },
+      { name: "Tlaxochimaco", days: 20 },
+      { name: "Xocotl Huetzi", days: 20 },
+      { name: "Ochpaniztli", days: 20 },
+      { name: "Teotleco", days: 20 },
+      { name: "Tepeilhuitl", days: 20 },
+      { name: "Quecholli", days: 20 },
+      { name: "Panquetzaliztli", days: 20 },
+      { name: "Atemoztli", days: 20 },
+      { name: "Tititl", days: 20 },
+      { name: "Izcalli", days: 20 }
+    ];
+
+    // Array dei nomi sacri
+    const sacredDayNames = [
+      "Cipactli (Coccodrillo)",
+      "Ehecatl (Vento)",
+      "Calli (Casa)",
+      "Cuetzpalin (Lucertola)",
+      "Coatl (Serpente)",
+      "Miquiztli (Morte)",
+      "Mazatl (Cervo)",
+      "Tochtli (Coniglio)",
+      "Atl (Acqua)",
+      "Itzcuintli (Cane)",
+      "Ozomahtli (Scimmia)",
+      "Malinalli (Erba)",
+      "Acatl (Canna)",
+      "Ocelotl (Giaguaro)",
+      "Cuauhtli (Aquila)",
+      "Cozcacuauhtli (Avvoltoio)",
+      "Ollin (Movimento)",
+      "Tecpatl (Coltello di selce)",
+      "Quiahuitl (Pioggia)",
+      "Xochitl (Fiore)"
+    ];
+
+    // Funzione per ottenere il numero del mese civile (per visualizzazione)
+    function getMonthNumber(civilMonthName) {
+      for (let i = 0; i < civilMonths.length; i++) {
+        if (civilMonths[i].name === civilMonthName) {
+          return i + 1;
+        }
+      }
+      return 0;
+    }
+
+    // Funzione per calcolare la conversione e il Numero di Destino
+    function computeConversion(inputDate) {
+      const selectedDate = new Date(inputDate);
+      selectedDate.setHours(12, 0, 0, 0);
+      if (selectedDate < baseDate1913) {
+        return { error: "La data è precedente al 2 febbraio 1913." };
+      }
+      let baseDateUsed = (selectedDate < baseDate1965) ? baseDate1913 : baseDate1965;
+      const baseDOY = getNonLeapDayOfYear(baseDateUsed);
+      const selectedDOY = getNonLeapDayOfYear(selectedDate);
+      const yearDiff = selectedDate.getFullYear() - baseDateUsed.getFullYear();
+      const diff = yearDiff * 365 + (selectedDOY - baseDOY);
+
+      // Calcolo del giorno civile
+      const civilDay = diff % 365;
+      let remainingDays = civilDay;
+      let civilMonthName = "";
+      let civilDayNumber = 0;
+      for (let i = 0; i < civilMonths.length; i++) {
+        if (remainingDays < civilMonths[i].days) {
+          civilMonthName = civilMonths[i].name;
+          civilDayNumber = remainingDays + 1;
+          break;
+        } else {
+          remainingDays -= civilMonths[i].days;
+        }
+      }
+      if (civilMonthName === "") {
+        civilMonthName = "Nemontemi (5 giorni infausti)";
+        civilDayNumber = remainingDays + 1;
+      }
+
+      const sacredDayIndex = diff % 260;
+      const sacredNumber = (sacredDayIndex % 13) + 1;
+      const sacredName = sacredDayNames[sacredDayIndex % 20];
+      const cycleUsed = (selectedDate < baseDate1965) ? "Ciclo 1913" : "Ciclo 1965";
+      const mindNumber = sacredDayNames.indexOf(sacredName) + 1;
+      const destinyNumber = civilDayNumber + mindNumber + sacredNumber;
+
+      return {
+        civil: { month: civilMonthName, day: civilDayNumber },
+        sacred: { number: sacredNumber, name: sacredName },
+        cycle: cycleUsed,
+        mindNumber: mindNumber,
+        destiny: destinyNumber
+      };
+    }
+
+    // Gestione della conversione per la data selezionata
+    document.getElementById("convertButton").addEventListener("click", () => {
+      const inputDate = document.getElementById("inputDate").value;
+      const resultDiv = document.getElementById("result");
+      if (!inputDate) {
+        alert("Per favore, inserisci una data valida.");
+        return;
+      }
+      const result = computeConversion(inputDate);
+      if (result.error) {
+        alert(result.error);
+      } else {
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        resultDiv.innerHTML = 
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Mente:</strong> ${result.mindNumber}</p>
+          <p><strong>Anima:</strong> ${result.sacred.number}</p>
+          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+          <p><em>${result.cycle}</em></p>
+        ;
+      }
+    });
+
+    // Funzione per cercare date in un intervallo con filtri multipli
+    function searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDateStr, endDateStr) {
+      const results = [];
+      let currentDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+      currentDate.setHours(12,0,0,0);
+      endDate.setHours(12,0,0,0);
+      while (currentDate <= endDate) {
+        const conv = computeConversion(currentDate);
+        if (conv.error) {
+          currentDate.setDate(currentDate.getDate() + 1);
+          continue;
+        }
+        let match = true;
+        if (destinyTarget !== null && destinyTarget !== "") {
+          if (conv.destiny !== destinyTarget) match = false;
+        }
+        if (civilTarget !== null && civilTarget !== "") {
+          if (conv.civil.day !== civilTarget) match = false;
+        }
+        if (sacredDayTarget !== null && sacredDayTarget !== "") {
+          if (conv.sacred.number !== sacredDayTarget) match = false;
+        }
+        if (sacredSymbolTarget !== null && sacredSymbolTarget !== "") {
+          if (conv.sacred.name.toLowerCase() !== sacredSymbolTarget.toLowerCase()) match = false;
+        }
+        if (match) {
+          results.push(currentDate.toISOString().split('T')[0]);
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return results;
+    }
+
+    // Gestione dell'evento per la ricerca con filtri multipli
+    document.getElementById("searchButton").addEventListener("click", () => {
+      const destinyValue = document.getElementById("destinyInput").value;
+      const civilValue = document.getElementById("civilInput").value;
+      const sacredDayValue = document.getElementById("sacredDayInput").value;
+      const sacredSymbolValue = document.getElementById("sacredSymbolInput").value;
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      const searchResultsDiv = document.getElementById("searchResults");
+
+      if (!startDate || !endDate) {
+        alert("Per favore, inserisci la data iniziale e la data finale.");
+        return;
+      }
+      
+      const destinyTarget = destinyValue ? parseInt(destinyValue) : "";
+      const civilTarget = civilValue ? parseInt(civilValue) : "";
+      const sacredDayTarget = sacredDayValue ? parseInt(sacredDayValue) : "";
+      const sacredSymbolTarget = sacredSymbolValue ? sacredSymbolValue.trim() : "";
+      
+      const datesFound = searchDatesByFilters(destinyTarget, civilTarget, sacredDayTarget, sacredSymbolTarget, startDate, endDate);
+      if (datesFound.length === 0) {
+        searchResultsDiv.innerHTML = "<p>Nessuna data trovata con i criteri inseriti.</p>";
+      } else {
+        searchResultsDiv.innerHTML = "<p>Date trovate:</p><ul>" +
+          datesFound.map(date => <li>${date}</li>).join('') +
+          "</ul>";
+      }
+    });
+
+    // Aggiornamento della conversione live
+    function updateLiveConversion() {
+      const today = new Date();
+      const result = computeConversion(today);
+      const liveDiv = document.getElementById("liveConversion");
+      if (result.error) {
+        liveDiv.textContent = result.error;
+      } else {
+        const civilMonthNumber = getMonthNumber(result.civil.month);
+        liveDiv.innerHTML = 
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Mente:</strong> ${result.mindNumber}</p>
+          <p><strong>Anima:</strong> ${result.sacred.number}</p>
+          <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
+          <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
+          <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
+          <p><em>${result.cycle}</em></p>
+        ;
+      }
+    }
+
+    // Funzione per aggiornare i dati astronomici
+    function updateAstroData() {
+      const now = new Date();
+      // API per alba e tramonto (esempio: Roma)
+      const apiUrl = "https://api.sunrise-sunset.org/json?lat=41.9028&lng=12.4964&formatted=0&date=" + now.toISOString().split('T')[0];
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "OK") {
+            const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
+            const sunriseUTC = new Date(data.results.sunrise);
+            const sunsetUTC = new Date(data.results.sunset);
+            const sunrise = sunriseUTC.toLocaleTimeString('it-IT', options);
+            const sunset = sunsetUTC.toLocaleTimeString('it-IT', options);
+            updateMoonPhase(sunrise, sunset, now);
+          } else {
+            document.getElementById("astroData").innerHTML = "<p>Errore nel recupero dati solari.</p>";
+          }
+        })
+        .catch(error => {
+          console.error("Errore nel fetch dei dati solari:", error);
+          document.getElementById("astroData").innerHTML = "<p>Errore nel recupero dati astronomici.</p>";
+        });
+    }
+
+    // Funzione per aggiornare la fase lunare usando un'API esterna con fallback
+    function updateMoonPhase(sunrise, sunset, now) {
+      const days = Math.floor(now.getTime() / 86400000);
+      const moonApiUrl = "https://api.farmsense.net/v1/moonphases/?d=" + days;
+      const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
+      fetch(moonApiUrl)
+        .then(response => response.json())
+        .then(moonData => {
+          if (moonData && moonData.length > 0) {
+            const phaseInfo = moonData[0];
+            const moonPhaseName = phaseInfo.Phase;
+            let phaseStart;
+            if (phaseInfo.Date) {
+              phaseStart = new Date(phaseInfo.Date).toLocaleTimeString('it-IT', options);
+            } else {
+              phaseStart = now.toLocaleTimeString('it-IT', options);
+            }
+            const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById("astroData").innerHTML = 
+              <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+              <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+              <p><strong>Ora attuale:</strong> ${currentTime}</p>
+            ;
+          } else {
+            fallbackMoonPhase(sunrise, sunset, now);
+          }
+        })
+        .catch(error => {
+          console.error("Errore nel fetch per fase lunare:", error);
+          fallbackMoonPhase(sunrise, sunset, now);
+        });
+    }
+
+    // Fallback per la fase lunare (calcolo approssimativo)
+    function fallbackMoonPhase(sunrise, sunset, now) {
+      const synodicMonth = 29.53058867;
+      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
+      let phase = ((now.getTime() - knownNewMoon.getTime()) / 86400000) % synodicMonth;
+      if (phase < 0) phase += synodicMonth;
+      let moonPhaseName = "";
+      if (phase < 1.84566) {
+        moonPhaseName = "Novilunio";
+      } else if (phase < 5.53699) {
+        moonPhaseName = "Crescente";
+      } else if (phase < 9.22831) {
+        moonPhaseName = "Primo Quarto";
+      } else if (phase < 12.91963) {
+        moonPhaseName = "Gibbosa Crescente";
+      } else if (phase < 16.61096) {
+        moonPhaseName = "Piena";
+      } else if (phase < 20.30228) {
+        moonPhaseName = "Gibbosa Calante";
+      } else if (phase < 23.99361) {
+        moonPhaseName = "Ultimo Quarto";
+      } else if (phase < 27.68493) {
+        moonPhaseName = "Calante";
+      } else {
+        moonPhaseName = "Novilunio";
+      }
+      const phaseStart = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+      const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
+      document.getElementById("astroData").innerHTML = 
+        <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStart})</p>
+        <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+        <p><strong>Ora attuale:</strong> ${currentTime}</p>
+      ;
+    }
+
+    // Inizializza conversione live e dati astronomici al caricamento
+    updateLiveConversion();
+    updateAstroData();
+
+    // Aggiorna conversione live e dati astronomici ogni minuto
+    setInterval(() => {
+      updateLiveConversion();
+      updateAstroData();
+    }, 60000);
+  </script>
+</body>
+</html>
