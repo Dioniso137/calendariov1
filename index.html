@@ -66,7 +66,7 @@
     button:hover {
       background: #444;
     }
-    #result, #searchResults, #liveConversion, #astroData {
+    #result, #searchResults, #liveConversion, #astroData, #sumResult {
       margin-top: 10px;
     }
     @media (max-width: 600px) {
@@ -98,6 +98,17 @@
       <input type="date" id="inputDate">
       <button id="convertButton">Converti</button>
       <div id="result"></div>
+    </div>
+
+    <!-- Nuova Sezione: Somma Conversioni di Due Date -->
+    <div class="section" id="sumSection">
+      <h2>Somma Conversioni di Due Date</h2>
+      <p>Inserisci la prima data:</p>
+      <input type="date" id="firstDate">
+      <p>Inserisci la seconda data:</p>
+      <input type="date" id="secondDate">
+      <button id="sumButton">Calcola Somma</button>
+      <div id="sumResult"></div>
     </div>
 
     <!-- Sezione Cerca Date per Numero di Destino e Filtri -->
@@ -309,6 +320,32 @@
            <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
            <p><em>${result.cycle}</em></p>`;
       }
+    });
+
+    // Gestione dell'evento per sommare i risultati di due date
+    document.getElementById("sumButton").addEventListener("click", () => {
+      const firstDate = document.getElementById("firstDate").value;
+      const secondDate = document.getElementById("secondDate").value;
+      const sumResultDiv = document.getElementById("sumResult");
+      if (!firstDate || !secondDate) {
+        alert("Per favore, inserisci entrambe le date.");
+        return;
+      }
+      const conv1 = computeConversion(firstDate);
+      const conv2 = computeConversion(secondDate);
+      if (conv1.error || conv2.error) {
+        alert("Una o entrambe le date non sono valide.");
+        return;
+      }
+      const sumSpirito = conv1.civil.day + conv2.civil.day;
+      const sumMente = conv1.mindNumber + conv2.mindNumber;
+      const sumAnima = conv1.sacred.number + conv2.sacred.number;
+      const sumDestino = conv1.destiny + conv2.destiny;
+      sumResultDiv.innerHTML = 
+        `<p><strong>Spirito:</strong> ${sumSpirito}</p>
+         <p><strong>Mente:</strong> ${sumMente}</p>
+         <p><strong>Anima:</strong> ${sumAnima}</p>
+         <p><strong>Numero di Destino:</strong> ${sumDestino}</p>`;
     });
 
     // Funzione per cercare date in un intervallo in base a un solo criterio
