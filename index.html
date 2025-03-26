@@ -497,6 +497,12 @@
         liveDiv.textContent = result.error;
       } else {
         const civilMonthNumber = getMonthNumber(result.civil.month);
+        const liveDateStr = today.toLocaleDateString('it-IT', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
         liveDiv.innerHTML = 
           `<p><strong>Spirito:</strong> ${result.civil.day}</p>
            <p><strong>Mente:</strong> ${result.mindNumber}</p>
@@ -504,7 +510,8 @@
            <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
            <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
            <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-           <p><em>${result.cycle}</em></p>`;
+           <p><em>${result.cycle}</em></p>
+           <p><strong>Data live:</strong> ${liveDateStr}</p>`;
       }
     }
 
