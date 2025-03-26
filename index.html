@@ -464,31 +464,7 @@
       }
     });
 
-    // Gestione dell'evento per la ricerca con filtro
-    document.getElementById("searchButton").addEventListener("click", () => {
-      const criterion = document.getElementById("filterCriterion").value;
-      const filterInputElement = document.getElementById("filterInput");
-      const filterValue = filterInputElement ? filterInputElement.value : "";
-      const startDate = document.getElementById("startDate").value;
-      const endDate = document.getElementById("endDate").value;
-      const searchResultsDiv = document.getElementById("searchResults");
-
-      if (!startDate || !endDate) {
-        alert("Per favore, inserisci la data iniziale e la data finale.");
-        return;
-      }
-      
-      const datesFound = searchDatesByFilter(criterion, filterValue, startDate, endDate);
-      if (datesFound.length === 0) {
-        searchResultsDiv.innerHTML = "<p>Nessuna data trovata con i criteri inseriti.</p>";
-      } else {
-        searchResultsDiv.innerHTML = "<p>Date trovate:</p><ul>" +
-          datesFound.map(date => `<li>${date}</li>`).join('') +
-          "</ul>";
-      }
-    });
-
-    // Aggiornamento della conversione live
+    // Aggiornamento della conversione live con data formattata
     function updateLiveConversion() {
       const today = new Date();
       const result = computeConversion(today);
@@ -515,11 +491,10 @@
       }
     }
 
-    // Funzione per aggiornare i dati astronomici
+    // Funzione per aggiornare i dati astronomici (usando le coordinate di Milano)
     function updateAstroData() {
       const now = new Date();
-      // API per alba e tramonto (esempio: Roma)
-      const apiUrl = "https://api.sunrise-sunset.org/json?lat=41.9028&lng=12.4964&formatted=0&date=" + now.toISOString().split('T')[0];
+      const apiUrl = "https://api.sunrise-sunset.org/json?lat=45.4642&lng=9.1900&formatted=0&date=" + now.toISOString().split('T')[0];
       fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -527,9 +502,13 @@
             const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
             const sunriseUTC = new Date(data.results.sunrise);
             const sunsetUTC = new Date(data.results.sunset);
+            const astroDawnUTC = new Date(data.results.astronomical_twilight_begin);
+            const astroDuskUTC = new Date(data.results.astronomical_twilight_end);
             const sunrise = sunriseUTC.toLocaleTimeString('it-IT', options);
             const sunset = sunsetUTC.toLocaleTimeString('it-IT', options);
-            updateMoonPhase(sunrise, sunset, now);
+            const astroDawn = astroDawnUTC.toLocaleTimeString('it-IT', options);
+            const astroDusk = astroDuskUTC.toLocaleTimeString('it-IT', options);
+            updateMoonPhase(sunrise, sunset, astroDawn, astroDusk, now);
           } else {
             document.getElementById("astroData").innerHTML = "<p>Errore nel recupero dati solari.</p>";
           }
@@ -540,8 +519,8 @@
         });
     }
 
-    // Funzione per aggiornare la fase lunare usando un'API esterna con fallback
-    function updateMoonPhase(sunrise, sunset, now) {
+    // Funzione per aggiornare la fase lunare e mostrare gli orari di alba/tramonto secondo il crepuscolo astronomico
+    function updateMoonPhase(sunrise, sunset, astroDawn, astroDusk, now) {
       const options = { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Rome' };
       const moonApiUrl = "https://api.farmsense.net/v1/moonphases/?d=" + Math.floor(now.getTime() / 86400000);
       fetch(moonApiUrl)
@@ -552,10 +531,8 @@
             let moonPhaseName = phaseInfo.Phase;
             let phaseStartStr;
             if (phaseInfo.Date) {
-              // Se la API fornisce una data, la usiamo
               phaseStartStr = new Date(phaseInfo.Date).toLocaleTimeString('it-IT', options);
             } else {
-              // Altrimenti usiamo il calcolo di fallback
               const computed = computeMoonPhaseStart(now);
               moonPhaseName = computed.moonPhaseName;
               phaseStartStr = computed.phaseStartStr;
@@ -563,27 +540,33 @@
             const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
             document.getElementById("astroData").innerHTML = 
               `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
-               <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+               <p><strong>Alba Astronomica:</strong> ${astroDawn}</p>
+               <p><strong>Alba (sorgere):</strong> ${sunrise}</p>
+               <p><strong>Tramonto (scomparsa):</strong> ${sunset}</p>
+               <p><strong>Tramonto Astronomico:</strong> ${astroDusk}</p>
                <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
           } else {
-            fallbackMoonPhase(sunrise, sunset, now);
+            fallbackMoonPhase(sunrise, sunset, astroDawn, astroDusk, now);
           }
         })
         .catch(error => {
           console.error("Errore nel fetch per fase lunare:", error);
-          fallbackMoonPhase(sunrise, sunset, now);
+          fallbackMoonPhase(sunrise, sunset, astroDawn, astroDusk, now);
         });
     }
 
-    // Fallback per la fase lunare (calcolo dell'orario di inizio della fase)
-    function fallbackMoonPhase(sunrise, sunset, now) {
+    // Fallback per la fase lunare in caso di errore nell'API della luna
+    function fallbackMoonPhase(sunrise, sunset, astroDawn, astroDusk, now) {
       const computed = computeMoonPhaseStart(now);
       const moonPhaseName = computed.moonPhaseName;
       const phaseStartStr = computed.phaseStartStr;
       const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       document.getElementById("astroData").innerHTML = 
         `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
-         <p><strong>Sole:</strong> Sorgere: ${sunrise} - Tramonto: ${sunset}</p>
+         <p><strong>Alba Astronomica:</strong> ${astroDawn}</p>
+         <p><strong>Alba (sorgere):</strong> ${sunrise}</p>
+         <p><strong>Tramonto (scomparsa):</strong> ${sunset}</p>
+         <p><strong>Tramonto Astronomico:</strong> ${astroDusk}</p>
          <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
     }
 
