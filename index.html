@@ -333,6 +333,49 @@
       return { moonPhaseName: computedPhaseName, phaseStartStr: phaseStartStr };
     }
 
+    // Funzione per cercare date in un intervallo in base a un solo criterio
+    function searchDatesByFilter(criterion, target, startDateStr, endDateStr) {
+      const results = [];
+      let currentDate = new Date(startDateStr);
+      const endDate = new Date(endDateStr);
+      currentDate.setHours(12,0,0,0);
+      endDate.setHours(12,0,0,0);
+      while (currentDate <= endDate) {
+        const conv = computeConversion(currentDate);
+        if (conv.error) {
+          currentDate.setDate(currentDate.getDate() + 1);
+          continue;
+        }
+        let match = true;
+        if (criterion && target !== "") {
+          switch (criterion) {
+            case "destiny":
+              if (conv.destiny !== parseInt(target)) match = false;
+              break;
+            case "civilDay":
+              if (conv.civil.day !== parseInt(target)) match = false;
+              break;
+            case "civilMonth":
+              if (getMonthNumber(conv.civil.month) !== parseInt(target)) match = false;
+              break;
+            case "sacredDay":
+              if (conv.sacred.number !== parseInt(target)) match = false;
+              break;
+            case "sacredSymbol":
+              if (conv.sacred.name.toLowerCase() !== target.toLowerCase()) match = false;
+              break;
+            default:
+              break;
+          }
+        }
+        if (match) {
+          results.push(currentDate.toISOString().split('T')[0]);
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return results;
+    }
+
     // Gestione della conversione per la data selezionata
     document.getElementById("convertButton").addEventListener("click", () => {
       const inputDate = document.getElementById("inputDate").value;
@@ -383,49 +426,6 @@
          <p><strong>Numero di Destino:</strong> ${sumDestino}</p>`;
     });
 
-    // Funzione per cercare date in un intervallo in base a un solo criterio
-    function searchDatesByFilter(criterion, target, startDateStr, endDateStr) {
-      const results = [];
-      let currentDate = new Date(startDateStr);
-      const endDate = new Date(endDateStr);
-      currentDate.setHours(12,0,0,0);
-      endDate.setHours(12,0,0,0);
-      while (currentDate <= endDate) {
-        const conv = computeConversion(currentDate);
-        if (conv.error) {
-          currentDate.setDate(currentDate.getDate() + 1);
-          continue;
-        }
-        let match = true;
-        if (criterion && target !== "") {
-          switch (criterion) {
-            case "destiny":
-              if (conv.destiny !== parseInt(target)) match = false;
-              break;
-            case "civilDay":
-              if (conv.civil.day !== parseInt(target)) match = false;
-              break;
-            case "civilMonth":
-              if (getMonthNumber(conv.civil.month) !== parseInt(target)) match = false;
-              break;
-            case "sacredDay":
-              if (conv.sacred.number !== parseInt(target)) match = false;
-              break;
-            case "sacredSymbol":
-              if (conv.sacred.name.toLowerCase() !== target.toLowerCase()) match = false;
-              break;
-            default:
-              break;
-          }
-        }
-        if (match) {
-          results.push(currentDate.toISOString().split('T')[0]);
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      return results;
-    }
-
     // Gestione dell'evento per la selezione del criterio filtro
     document.getElementById("filterCriterion").addEventListener("change", (e) => {
       const criterion = e.target.value;
@@ -461,6 +461,29 @@
             break;
         }
         filterInputArea.innerHTML = `<input type="number" id="filterInput" placeholder="${placeholder}">`;
+      }
+    });
+
+    // Gestione dell'evento per il pulsante "Cerca Date"
+    document.getElementById("searchButton").addEventListener("click", () => {
+      const criterion = document.getElementById("filterCriterion").value;
+      const filterInputElem = document.getElementById("filterInput");
+      const target = filterInputElem ? filterInputElem.value : "";
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+      
+      if (!startDate || !endDate) {
+        alert("Per favore, inserisci la data iniziale e la data finale.");
+        return;
+      }
+      
+      const results = searchDatesByFilter(criterion, target, startDate, endDate);
+      const searchResultsDiv = document.getElementById("searchResults");
+      
+      if (results.length === 0) {
+        searchResultsDiv.innerHTML = "<p>Nessuna data trovata per i criteri specificati.</p>";
+      } else {
+        searchResultsDiv.innerHTML = "<p>Risultati:</p><ul>" + results.map(date => `<li>${date}</li>`).join("") + "</ul>";
       }
     });
 
