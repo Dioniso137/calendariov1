@@ -163,6 +163,28 @@
       <h2>Dati Astronomici Live</h2>
       <div id="astroData">Caricamento dati astronomici...</div>
     </div>
+
+    <!-- Sezione Skymap -->
+    <div class="section" id="skymapSection">
+      <h2>Skymap</h2>
+      <div id="av-skymap">
+        <script>
+          var avSkymapProperties = {
+              location: {
+                  lon:  9.190,
+                  lat:  45.464,
+                  name: 'Milano',
+                  tz:   'Europe/Rome'
+              },
+              deco: 16399,
+              size: 600,
+              bgColor: '#000000',
+              lang: 'en'
+          };
+        </script>
+        <script src="https://www.astroviewer.net/widgets/widgets/skymap.js"></script>
+      </div>
+    </div>
   </div>
 
   <script>
