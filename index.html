@@ -168,11 +168,25 @@
     <div class="section" id="skymapSection">
       <h2>Skymap</h2>
       <div id="av-skymap">
-        <iframe width="500" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://slowe.github.io/VirtualSky/embed?longitude=9.225847&latitude=45.492008&projection=lambert&constellationlabels=true&constellationboundaries=true&meteorshowers=true&showstars=false&showstarlabels=true&gridlines_az=true&live=true&az=212.6949672073846" allowTransparency="true"></iframe>
+        <script>
+          var avSkymapProperties = {
+              location: {
+                  lon:  9.190,
+                  lat:  45.464,
+                  name: 'Milano',
+                  tz:   'Europe/Rome'
+              },
+              deco: 16399,
+              size: 600,
+              bgColor: '#1e1e1e',
+              lang: 'en'
+          };
+        </script>
+        <script src="https://www.astroviewer.net/widgets/widgets/skymap.js"></script>
       </div>
     </div>
   </div>
-<iframe width="500" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://slowe.github.io/VirtualSky/embed?longitude=9.225847&latitude=45.492008&projection=lambert&constellationlabels=true&constellationboundaries=true&meteorshowers=true&showstars=false&showstarlabels=true&gridlines_az=true&live=true&az=212.6949672073846" allowTransparency="true"></iframe>
+
   <script>
     // Tema chiaro/scuro
     document.getElementById("themeSwitch").addEventListener("change", function() {
