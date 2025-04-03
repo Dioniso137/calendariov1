@@ -164,27 +164,9 @@
       <div id="astroData">Caricamento dati astronomici...</div>
     </div>
 
-    <!-- Sezione Skymap -->
-    <div class="section" id="skymapSection">
-      <h2>Skymap</h2>
-      <div id="av-skymap">
-        <script>
-          var avSkymapProperties = {
-              location: {
-                  lon:  9.190,
-                  lat:  45.464,
-                  name: 'Milano',
-                  tz:   'Europe/Rome'
-              },
-              deco: 16399,
-              size: 600,
-              bgColor: '#1e1e1e',
-              lang: 'en'
-          };
-        </script>
-        <script src="https://www.astroviewer.net/widgets/widgets/skymap.js"></script>
-      </div>
-      <!-- Bottone Virtual Sky -->
+    <!-- Sezione Virtual Sky: Solo Bottone -->
+    <div class="section" id="virtualSkySection">
+      <h2>Virtual Sky</h2>
       <button onclick="window.location.href='https://slowe.github.io/VirtualSky/embed?longitude=9.146650796557564&latitude=45.43482543073661&projection=lambert&live=true&az=127'">
         Virtual Sky
       </button>
