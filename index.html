@@ -185,10 +185,6 @@
         <script src="https://www.astroviewer.net/widgets/widgets/skymap.js"></script>
       </div>
     </div>
-
-    <!-- Nuovo iframe VirtualSky -->
-    <iframe width="500" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://slowe.github.io/VirtualSky/embed?&projection=lambert&live=true&az=255.75" allowTransparency="true"></iframe>
-    
   </div>
 
   <script>
@@ -416,13 +412,13 @@
       } else {
         const civilMonthNumber = getMonthNumber(result.civil.month);
         resultDiv.innerHTML = 
-          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
            <p><strong>Mente:</strong> ${result.mindNumber}</p>
            <p><strong>Anima:</strong> ${result.sacred.number}</p>
            <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
            <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
            <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
-           <p><em>${result.cycle}</em></p>`;
+           <p><em>${result.cycle}</em></p>;
       }
     });
 
@@ -446,10 +442,10 @@
       const sumAnima = conv1.sacred.number + conv2.sacred.number;
       const sumDestino = conv1.destiny + conv2.destiny;
       sumResultDiv.innerHTML = 
-        `<p><strong>Spirito:</strong> ${sumSpirito}</p>
+        <p><strong>Spirito:</strong> ${sumSpirito}</p>
          <p><strong>Mente:</strong> ${sumMente}</p>
          <p><strong>Anima:</strong> ${sumAnima}</p>
-         <p><strong>Numero di Destino:</strong> ${sumDestino}</p>`;
+         <p><strong>Numero di Destino:</strong> ${sumDestino}</p>;
     });
 
     // Gestione dell'evento per la selezione del criterio filtro
@@ -461,12 +457,12 @@
         return;
       }
       if (criterion === "sacredSymbol") {
-        let selectHtml = `<select id="filterInput">
-                            <option value="">-- Seleziona Simbolo Sacro --</option>`;
+        let selectHtml = <select id="filterInput">
+                            <option value="">-- Seleziona Simbolo Sacro --</option>;
         sacredDayNames.forEach(symbol => {
-          selectHtml += `<option value="${symbol}">${symbol}</option>`;
+          selectHtml += <option value="${symbol}">${symbol}</option>;
         });
-        selectHtml += `</select>`;
+        selectHtml += </select>;
         filterInputArea.innerHTML = selectHtml;
       } else {
         let placeholder = "";
@@ -486,7 +482,7 @@
           default:
             break;
         }
-        filterInputArea.innerHTML = `<input type="number" id="filterInput" placeholder="${placeholder}">`;
+        filterInputArea.innerHTML = <input type="number" id="filterInput" placeholder="${placeholder}">;
       }
     });
 
@@ -509,7 +505,7 @@
       if (results.length === 0) {
         searchResultsDiv.innerHTML = "<p>Nessuna data trovata per i criteri specificati.</p>";
       } else {
-        searchResultsDiv.innerHTML = "<p>Risultati:</p><ul>" + results.map(date => `<li>${date}</li>`).join("") + "</ul>";
+        searchResultsDiv.innerHTML = "<p>Risultati:</p><ul>" + results.map(date => <li>${date}</li>).join("") + "</ul>";
       }
     });
 
@@ -529,14 +525,14 @@
           day: 'numeric'
         });
         liveDiv.innerHTML = 
-          `<p><strong>Spirito:</strong> ${result.civil.day}</p>
+          <p><strong>Spirito:</strong> ${result.civil.day}</p>
            <p><strong>Mente:</strong> ${result.mindNumber}</p>
            <p><strong>Anima:</strong> ${result.sacred.number}</p>
            <p><strong>Simbolo:</strong> ${result.sacred.name}</p>
            <p><strong>Mese Civile:</strong> ${civilMonthNumber} - ${result.civil.month}</p>
            <p><strong>Numero di Destino:</strong> ${result.destiny}</p>
            <p><em>${result.cycle}</em></p>
-           <p><strong>Data live:</strong> ${liveDateStr}</p>`;
+           <p><strong>Data live:</strong> ${liveDateStr}</p>;
       }
     }
 
@@ -588,12 +584,12 @@
             }
             const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
             document.getElementById("astroData").innerHTML = 
-              `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
+              <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
                <p><strong>Alba Astronomica:</strong> ${astroDawn}</p>
                <p><strong>Alba (sorgere):</strong> ${sunrise}</p>
                <p><strong>Tramonto (scomparsa):</strong> ${sunset}</p>
                <p><strong>Tramonto Astronomico:</strong> ${astroDusk}</p>
-               <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
+               <p><strong>Ora attuale:</strong> ${currentTime}</p>;
           } else {
             fallbackMoonPhase(sunrise, sunset, astroDawn, astroDusk, now);
           }
@@ -611,12 +607,12 @@
       const phaseStartStr = computed.phaseStartStr;
       const currentTime = now.toLocaleTimeString('it-IT', {hour: '2-digit', minute:'2-digit'});
       document.getElementById("astroData").innerHTML = 
-        `<p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
+        <p><strong>Luna:</strong> Fase: ${moonPhaseName} (inizio: ${phaseStartStr})</p>
          <p><strong>Alba Astronomica:</strong> ${astroDawn}</p>
          <p><strong>Alba (sorgere):</strong> ${sunrise}</p>
          <p><strong>Tramonto (scomparsa):</strong> ${sunset}</p>
          <p><strong>Tramonto Astronomico:</strong> ${astroDusk}</p>
-         <p><strong>Ora attuale:</strong> ${currentTime}</p>`;
+         <p><strong>Ora attuale:</strong> ${currentTime}</p>;
     }
 
     // Inizializza conversione live e dati astronomici al caricamento
